@@ -1,3 +1,0 @@
-[11551:259:0628/162002.666332:WARNING:controller_impl.cc(1190)] Background download complete, client: 6, completion type: 0, file size:265060
-[11551:259:0628/162005.981022:WARNING:controller_impl.cc(1190)] Background download complete, client: 6, completion type: 0, file size:45567003
-[11551:259:0628/162016.491443:WARNING:pref_notifier_impl.cc(41)] Pref observer for media_router.cast_allow_all_ips found at shutdown.
