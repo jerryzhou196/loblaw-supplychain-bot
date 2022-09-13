@@ -1,0 +1,66 @@
+// This function closes the filter popup
+function closeFilters() {
+	document.getElementById("filters").style.display = "none";
+}
+
+// This function displays the date filter selected
+function cb(start, end) {
+	$('#reportrange span').html(moment(start).format('MMMM D, YYYY') + ' - ' + moment(end).format('MMMM D, YYYY'));
+}
+
+// This function resets all filters selected
+
+function clearFilters() {
+	var pageID = document.getElementById('pageID').value;
+
+	if ((pageID.split('_')[0] == 'servicelevel' || pageID.split('_')[0] == 'firmflags' || pageID.split('_')[0] == 'staledate') ) {
+		var start = moment().subtract(1, 'days').format('YYYY-MM-DD');
+		var end = moment().subtract(1, 'days').format('YYYY-MM-DD');
+		var start = moment().subtract(1, 'days').format('YYYY-MM-DD');
+		var end = moment().subtract(1, 'days').format('YYYY-MM-DD');
+	} else if (pageID.split('_')[0] == 'ipfrusage') {
+		if (moment().subtract(1, 'Year').startOf('Year').isoWeekday() < 3 || moment().subtract(1, 'Year').startOf('Year').isoWeekday() == 7) {
+			var start = moment().startOf('Year').startOf('Week').format('YYYY-MM-DD');
+			var end = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+		} else {
+			var start = moment().subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days').format('YYYY-MM-DD');
+			var end = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+		}
+	} else if (pageID.split('_')[0] == 'ldeforecasterror') {
+		var start = moment().isoWeekday(-7).format('YYYY-MM-DD');
+		var end = moment().isoWeekday(-1).format('YYYY-MM-DD');
+		var start = moment().isoWeekday(-7).format('YYYY-MM-DD');
+		var end = moment().isoWeekday(-1).format('YYYY-MM-DD');
+	} else {
+		var start = moment().format('YYYY-MM-DD');
+		var end = moment().format('YYYY-MM-DD');
+		var start = moment().format('YYYY-MM-DD');
+		var end = moment().format('YYYY-MM-DD');
+	}
+	cb(start, end); //resets the date range finder bar to the default
+
+	// resets the date range hidden input values
+	document.getElementById("DateStart").value = moment(start).format('YYYY-MM-DD');
+	document.getElementById("DateEnd").value = moment(end).format('YYYY-MM-DD');
+
+	//resets all other values
+	document.getElementById("VP").value = 0;
+	document.getElementById("DIRECTOR").value = 0;
+	document.getElementById("SENIOR_MANAGER").value = 0;
+	document.getElementById("BUYER_NAME").value = 0;
+	document.getElementById("MCH_3_DESC_E").value = 0;
+	document.getElementById("MCH_2_DESC_E").value = 0;
+	document.getElementById("MCH_1_DESC_E").value = 0;
+	document.getElementById("MCH_0_DESC_E").value = 0;
+	document.getElementById("BANNER").value = 0;
+	document.getElementById("REGION").value = 0;
+	document.getElementById("brand_type_code").value = 0;
+	document.getElementById("COMPANY").value = 0;
+	document.getElementById("ethnic_flag_desc_en").value = 0;
+	document.getElementById("organic_ind").value = 0;
+	
+	//document.getElementById("generic_ind").value = 0;
+	//document.getElementById("buyernum").value = 0;
+	//document.getElementById("dcfil").value = 0;
+	
+}

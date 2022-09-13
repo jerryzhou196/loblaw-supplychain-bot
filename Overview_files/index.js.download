@@ -1,0 +1,492 @@
+document.getElementById("VP_tab").style.display = "table-cell";
+document.getElementById("DIRECTOR_tab").style.display = "table-cell";
+document.getElementById("SENIOR_MANAGER_tab").style.display = "table-cell";
+document.getElementById("BUYER_NAME_tab").style.display = "table-cell";
+document.getElementById("BUYER_NUMBER_tab").style.display = "table-cell";
+
+document.getElementById("MCH_3_DESC_E_tab").style.display = "table-cell";
+document.getElementById("MCH_2_DESC_E_tab").style.display = "table-cell";
+document.getElementById("MCH_1_DESC_E_tab").style.display = "table-cell";
+document.getElementById("MCH_0_DESC_E_tab").style.display = "table-cell";
+document.getElementById("REGION_tab").style.display = "table-cell";
+document.getElementById("COMPANY_tab").style.display = "table-cell";
+document.getElementById("ethnic_flag_desc_en_tab").style.display = "table-cell";
+document.getElementById("organic_ind_tab").style.display = "table-cell";
+document.getElementById("brand_type_code_tab").style.display = "table-cell";
+
+var filters = ["VP_tab", "DIRECTOR_tab", "SENIOR_MANAGER_tab", "BUYER_NAME_tab", "BUYER_NUMBER_tab", "MCH_3_DESC_E_tab"]
+
+// This function reloads the window
+window.onload = function () {
+	// if statement checks if there is anything in the url filter carried over from the front page to not overload the default WtD
+	if (window.location.search != '') {
+		document.getElementById("Output").value = "?" + window.location.search.substr(1);
+		applyDefaultFilters();
+		appliedFilters();
+		updateLinks();
+		resetGraphs();
+		refreshGraphs();
+	} else {
+		if (document.cookie.indexOf('Output=') != -1) {
+			document.getElementById('Output').value = readCookie();
+		} else {
+			generateGetString();
+		}
+		updateLinks();
+		applyDefaultFilters();
+		appliedFilters(); // used to update the applied filters buttons
+		resetGraphs(); // display the loading graphs
+		refreshGraphs(); // refresh relevant graphs. This function will be defined in another js file specific to the page
+		if (window.location.pathname == '/') { $('#releaseNotes').modal('show'); } //show the modal 
+	}
+}
+
+// This function refreshes the graphs
+function refreshGraphs() {
+
+	var getData = document.getElementById("Output").value;
+
+	var xhttp_sd;
+	if (window.XMLHttpRequest) {
+		// code for modern browsers
+		xhttp_sd = new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhttp_sd = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhttp_sd.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			if (this.responseText.includes("not found in")) {
+				document.getElementById("sd").innerHTML = "<p>Please clear filters and try again</p>";
+			}
+			else {
+				document.getElementById("sd").innerHTML = this.responseText;
+				loadChart_sd();
+			}
+		}
+	};
+	xhttp_sd.open("GET", "/staledate/yoy.php" + getData, true);
+	xhttp_sd.send();
+
+	var xhttp_ff;
+	if (window.XMLHttpRequest) {
+		// code for modern browsers
+		xhttp_ff = new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhttp_ff = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhttp_ff.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			if (this.responseText.includes("not found in")) {
+				document.getElementById("ff").innerHTML = "<p>Please clear filters and try again</p>";
+			}
+			else {
+				document.getElementById("ff").innerHTML = this.responseText;
+				loadChart_ff();
+			}
+		}
+	};
+	xhttp_ff.open("GET", "/firmflags/yoy.php" + getData, true);
+	xhttp_ff.send();
+
+
+	var xhttp_ipfrusg;
+	var filtered = cutFilters(['MCH_3_DESC_E', 'DIVISION', 'brand_type_code', 'MCH_2_DESC_E', 'BANNER', 'grp_code', 'ACTIVE_IND',
+		'MCH_1_DESC_E', 'ethnic_flag_desc_en', 'STORE', 'INOUT_IND', 'MCH_0_DESC_E', 'organic_ind'], getData);
+	if (window.XMLHttpRequest) {
+		// code for modern browsers
+		xhttp_ipfrusg = new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhttp_ipfrusg = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhttp_ipfrusg.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("ipfrusage").innerHTML = this.responseText;
+			loadChart_ipfrusg();
+		}
+	};
+	xhttp_ipfrusg.open("GET", "/ipfrusage/yoyfirstlayer.php" + filtered, true);
+	xhttp_ipfrusg.send();
+
+
+
+	var xhttp_sl;
+	if (window.XMLHttpRequest) {
+		// code for modern browsers
+		xhttp_sl = new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhttp_sl = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhttp_sl.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			if (this.responseText.includes("not found in")) {
+				document.getElementById("sl").innerHTML = "<p>Please clear filters and try again</p>";
+			}
+			else {
+				document.getElementById("sl").innerHTML = this.responseText;
+				loadChart_sl();
+			}
+		}
+	};
+
+	xhttp_sl.open("GET", "/servicelevel/yoy.php" + getData, true);
+	xhttp_sl.send();
+
+	var xhttp_inv;
+	if (window.XMLHttpRequest) {
+		// code for modern browsers
+		xhttp_inv = new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhttp_inv = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhttp_inv.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			if (this.responseText.includes("not found in")) {
+				document.getElementById("inv").innerHTML = "<p>Please clear filters and try again</p>";
+			}
+			else {
+				document.getElementById("inv").innerHTML = this.responseText;
+				loadChart_inv();
+			}
+		}
+	};
+	xhttp_inv.open("GET", "/inventory/yoy.php" + getData, true);
+	xhttp_inv.send();
+
+	var xhttp_avail;
+	if (window.XMLHttpRequest) {
+		// code for modern browsers
+		xhttp_avail = new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhttp_avail = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhttp_avail.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			if (this.responseText.includes("not found in")) {
+				document.getElementById("avail").innerHTML = "<p>Please clear filters and try again</p>";
+			}
+			else {
+				document.getElementById("avail").innerHTML = this.responseText;
+				loadChart_avail();
+			}
+		}
+	};
+
+	xhttp_avail.open("GET", "/availability/yoy.php" + getData, true);
+	xhttp_avail.send();
+}
+
+// This function loads the year over year charts
+function loadChart_sl() {
+
+	var datalast = document.getElementById("datalast").value;
+	var datathis = document.getElementById("datathis").value;
+
+	if (datalast == "[]" && datathis == "[]") {
+		document.getElementById("sl").innerHTML = "";
+		document.getElementById("sl").innerHTML = "No data exists for the selected filters";
+	}
+	else {
+		var jsonDatalast = JSON.parse(datalast);
+		var jsonDatathis = JSON.parse(datathis);
+
+		var chart_sl = new CanvasJS.Chart("chartContainerYoy", {
+			title: {
+				fontFamily: "Calibri",
+				fontWeight: "bold",
+				text: "Service Level %"
+			},
+			axisY: {
+				title: "Service Level %",
+				valueFormatString: "##.#%",
+				gridDashType: "dot"
+			},
+			toolTip: {
+				enabled: true   //enable here
+			},
+			data: [{
+				name: "Last Year's Service Level",
+				type: "line",
+				showInLegend: true,
+				yValueFormatString: "##.##%",
+				lineThickness: 3,
+				dataPoints: jsonDatalast,
+			}, {
+				name: "Current Year's Service Level",
+				type: "line",
+				showInLegend: true,
+				yValueFormatString: "##.##%",
+				lineThickness: 3,
+				dataPoints: jsonDatathis,
+			}]
+
+		});
+		chart_sl.render();
+	}
+}
+
+
+function loadChart_ipfrusg() {
+
+	var datalast_usg = document.getElementById("dataUsageLast").value;
+	var datathis_usg = document.getElementById("dataUsageCurrent").value;
+
+	if (datalast_usg == "[]" && datathis_usg == "[]") {
+		document.getElementById("ipfrusage").innerHTML = "";
+		document.getElementById("ipfrusage").innerHTML = "No data exists for the selected filters";
+	}
+	else {
+		var jsonDatalast_usg = JSON.parse(datalast_usg);
+		var jsonDatathis_usg = JSON.parse(datathis_usg);
+
+		var chart_ipfrusg = new CanvasJS.Chart("chartContainerUsageTotalFirstLayer", {
+			title: {
+				fontFamily: "Calibri",
+				fontWeight: "bold",
+				text: "IPFR Usage %"
+			},
+			axisY: {
+				title: "IPFR Usage %",
+				valueFormatString: "##.#%",
+				gridDashType: "dot"
+			},
+			toolTip: {
+				enabled: true   //enable here
+			},
+			data: [{
+				name: "Last Year's IPFR Usage",
+				type: "line",
+				markerType: "none",
+				showInLegend: true,
+				yValueFormatString: "##.#%",
+				lineThickness: 3,
+				dataPoints: jsonDatalast_usg,
+			}, {
+				name: "Current Year's IPFR Usage",
+				type: "line",
+				markerType: "none",
+				showInLegend: true,
+				yValueFormatString: "##.#%",
+				lineThickness: 3,
+				dataPoints: jsonDatathis_usg,
+			}]
+
+		});
+		chart_ipfrusg.render();
+	}
+}
+
+function loadChart_ff() {
+
+	var datalast = document.getElementById("datalastyoy").value;
+	var datacurrent = document.getElementById("datacurrentyoy").value;
+
+	if (datacurrent == "[]" && datalast == "[]") {
+		document.getElementById("ff").innerHTML = "";
+		document.getElementById("ff").innerHTML = "No data exists for the selected filters";
+	} else {
+		var jsonDatalast = JSON.parse(datalast);
+		var jsonDatacurrent = JSON.parse(datacurrent);
+
+		var chart_ff = new CanvasJS.Chart("chartContainerffYoy", {
+			title: {
+				fontFamily: "Calibri",
+				fontWeight: "bold",
+				text: "Average Firm Flag Count"
+			},
+			axisY: {
+				title: "Avg Firm Flags",
+				valueFormatString: "########",
+				gridDashType: "dot"
+			},
+			toolTip: {
+				enabled: true   //enable here
+			},
+			data: [{
+				name: "Last Year's Firm Flags",
+				type: "line",
+				markerType: "none",
+				showInLegend: true,
+				yValueFormatString: "######",
+				lineThickness: 3,
+				dataPoints: jsonDatalast
+			}, {
+				name: "Current Year's Firm Flags",
+				type: "line",
+				markerType: "none",
+				showInLegend: true,
+				yValueFormatString: "######",
+				lineThickness: 3,
+				dataPoints: jsonDatacurrent
+			}]
+		});
+		chart_ff.render();
+	}
+}
+
+function loadChart_avail() {
+
+	var dataLast = document.getElementById("dataLast").value;
+	var dataCurrent = document.getElementById("dataCurrent").value;
+
+	if (dataLast == "[]" && dataCurrent == "[]") {
+		document.getElementById("avail").innerHTML = "";
+		document.getElementById("avail").innerHTML = "No data exists for the selected filters";
+	}
+	else {
+		var jsonDataLast = JSON.parse(dataLast);
+		var jsonDataCurrent = JSON.parse(dataCurrent);
+
+		var chart_avail = new CanvasJS.Chart("chartContainerAvailYoy", {
+			title: {
+				fontFamily: "Calibri",
+				fontWeight: "bold",
+				text: "Availability %"
+			},
+			axisY: {
+				title: "Availability %",
+				valueFormatString: "##.#%",
+				gridDashType: "dot"
+			},
+			toolTip: {
+				enabled: true   //enable here
+			},
+			data: [{
+				name: "Last Year's Availability",
+				type: "line",
+				markerType: "none",
+				showInLegend: true,
+				yValueFormatString: "##.##%",
+				lineThickness: 3,
+				dataPoints: jsonDataLast
+			}, {
+				name: "Current Year's Availability",
+				type: "line",
+				markerType: "none",
+				showInLegend: true,
+				yValueFormatString: "##.##%",
+				lineThickness: 3,
+				dataPoints: jsonDataCurrent
+			}]
+
+		});
+		chart_avail.render();
+	}
+}
+
+function addSymbols(e) {
+	var suffixes = ["", "K", "M", "B"];
+
+	var order = Math.max(Math.floor(Math.log(e.value) / Math.log(1000)), 0);
+	if (order > suffixes.length - 1)
+		order = suffixes.length - 1;
+
+	var suffix = suffixes[order];
+	return CanvasJS.formatNumber(e.value / Math.pow(1000, order)) + suffix;
+}
+
+function loadChart_sd() {
+	var dollarsLY = document.getElementById("SDdollarsLY").value;
+	var dollarsCY = document.getElementById("SDdollarsCY").value;
+
+	if (dollarsLY == "[]" && dollarsCY == "[]") {
+		document.getElementById("sd").innerHTML = "";
+		document.getElementById("sd").innerHTML = "No data exists for the selected filters";
+	}
+	else {
+		var jsonDol0 = JSON.parse(dollarsLY);
+		var jsonDol1 = JSON.parse(dollarsCY);
+
+		var chart_sd = new CanvasJS.Chart("chartContainerSDYoy", {
+			title: {
+				fontFamily: "Calibri",
+				fontWeight: "bold",
+				text: "Staledate $"
+			},
+			axisY: {
+				title: "Staledate Dollars",
+				labelFormatter: addSymbols,
+				gridDashType: "dot"
+			},
+			toolTip: {
+				enabled: true   //enable here
+				//shared: true
+			},
+			data: [{
+				type: "line",
+				name: "Last Year's Staledate ($)",
+				yValueFormatString: "$#,##0.#0",
+				markerType: "none",
+				showInLegend: true,
+				lineThickness: 3,
+				dataPoints: jsonDol0
+			}, {
+				type: "line",
+				name: "Current Year's Staledate ($)",
+				yValueFormatString: "$#,##0.#0",
+				markerType: "none",
+				showInLegend: true,
+				lineThickness: 3,
+				dataPoints: jsonDol1
+			}]
+
+		});
+		chart_sd.render();
+	}
+}
+
+function loadChart_inv() {
+	var dollarsLY = document.getElementById("dollarsLY").value;
+	var dollarsCY = document.getElementById("dollarsCY").value;
+
+	if (dollarsLY == "[]" && dollarsCY == "[]") {
+		document.getElementById("inv").innerHTML = "";
+		document.getElementById("inv").innerHTML = "No data exists for the selected filters";
+	}
+	else {
+		var jsonDol0 = JSON.parse(dollarsLY);
+		var jsonDol1 = JSON.parse(dollarsCY);
+
+		var chart_inv = new CanvasJS.Chart("chartContainerInvYoy", {
+			title: {
+				fontFamily: "Calibri",
+				fontWeight: "bold",
+				text: "Inventory $"
+			},
+			axisY: {
+				title: "Dollars on Hand",
+				labelFormatter: addSymbols,
+				gridDashType: "dot"
+			},
+			toolTip: {
+				enabled: true   //enable here
+				//shared: true
+			},
+			data: [{
+				type: "line",
+				name: "Last Year's Inventory ($)",
+				yValueFormatString: "$#,##0.#0",
+				markerType: "none",
+				showInLegend: true,
+				lineThickness: 3,
+				dataPoints: jsonDol0
+			}, {
+				type: "line",
+				name: "Current Year's Inventory ($)",
+				yValueFormatString: "$#,##0.#0",
+				markerType: "none",
+				showInLegend: true,
+				lineThickness: 3,
+				dataPoints: jsonDol1
+			}]
+
+		});
+		chart_inv.render();
+	}
+}
+

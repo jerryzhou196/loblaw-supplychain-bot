@@ -1,0 +1,29 @@
+* {
+    font-family: Calibri;
+}
+
+#filterDiv {
+    width: 680px !important;
+}
+
+#container {
+    width: 99%;
+    margin:auto;
+}
+
+.graph {
+    height: 300px;
+    float: left;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.link {
+    height: 30px;
+    float: left;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}

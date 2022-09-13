@@ -1,0 +1,2495 @@
+// page ID format: Front Page = x, Graphs Pages = x_y, Details Pages = x_y_z
+// x: Metric indicator ex. (firmflag, servicelevel, frontpage, availability, inventory)
+// x: while naming new pages, the x value should correspond to the folder of the metric 
+// y: Page indicator between graphs and details pages ex.(availability_graphs, servicelevel_details_z) 
+// y: while naming new pages, the y value should be either 'graphs' or 'details' depending on the page
+// z: Details indicator for details pages ex. (firmflag_details_shorts, servicelevel_details_t3)
+// z: while naming new pages, the z value should correspond to the folder name of the details page
+var pageID = document.getElementById('pageID').value
+
+// generateIn(selectedFilters = Array of Str) => Produces Str
+// Generates the in statement arguments to accomodate multiple filters of the same type being chosen
+// the in statement change allows the SQL queries to correctly filter for multiple criteria
+// result has format: ('x', 'y')
+function generateIn(selectedFilters) {
+	var l = selectedFilters.length;
+	if (l == 0) {
+		return selectedFilters;
+	}
+	var input = '(';
+	for (i = 0; i < l; i++) {
+		input = input.concat('\'');
+		input = input.concat(selectedFilters[i]);
+		input = input.concat('\', ');
+	}
+	input = input.slice(0, -2);
+	input = input.concat(')');
+	return input;
+}
+
+// Active Indicator Multi-Select Functionality
+var selectedActive = [];
+function applyActive(s) {
+	var filters = generateIn(s);
+	$('#ACTIVE_IND').attr("value", filters);
+}
+$('#ACTIVE_IND').on('change', function () {
+	var local = [];
+	$('#ACTIVE_IND option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedActive = local;
+});
+
+// Banner Multi-Select Functionality
+var selectedBanner = [];
+function applyBanner(s) {
+	var filters = generateIn(s);
+	$('#BANNER').attr("value", filters);
+}
+$('#BANNER').on('change', function () {
+	var local = [];
+	$('#BANNER option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedBanner = local;
+	console.log(selectedBanner);
+	getOptionsLoc(1, selectedBanner);
+});
+
+// Brand Multi-Select Functionality
+var selectedBrand = [];
+function applyBrand(s) {
+	var filters = generateIn(s);
+	document.getElementById("brand_type_code").setAttribute("value", filters);
+	$('#brand_type_code').attr("value", filters);
+}
+$('#brand_type_code').on('change', function () {
+	var local = [];
+	$('#brand_type_code option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedBrand = local;
+	console.log(selectedBrand);
+});
+
+// Company Multi-Select Functionality
+var selectedCompany = [];
+function applyCompany(s) {
+	var filters = generateIn(s);
+	document.getElementById("COMPANY").setAttribute("value", filters);
+	$('#COMPANY').attr("value", filters);
+}
+$('#COMPANY').on('change', function () {
+	var local = [];
+	$('#COMPANY option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedCompany = local;
+	console.log(selectedCompany);
+});
+
+// Division Multi-Select Functionality
+var selectedDivision = [];
+function applyDivision(s) {
+	var filters = generateIn(s);
+	document.getElementById("DIVISION").setAttribute("value", filters);
+	$('#DIVISION').attr("value", filters);
+}
+$('#DIVISION').on('change', function () {
+	var local = [];
+	$('#DIVISION option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedDivision = local;
+	console.log(selectedDivision);
+	getOptionsLoc(0, selectedDivision);
+});
+
+
+// Ethnic Multi-Select Functionality
+var selectedEthnic = [];
+function applyEthnic(s) {
+	var filters = generateIn(s);
+	document.getElementById("ethnic_flag_desc_en").setAttribute("value", filters);
+	$('#ethnic_flag_desc_en').attr("value", filters);
+}
+$('#ethnic_flag_desc_en').on('change', function () {
+	var local = [];
+	$('#ethnic_flag_desc_en option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedEthnic = local;
+	console.log(selectedEthnic);
+});
+
+// Food Indicator Multi-Select Functionality
+var selectedFoodInd = [];
+function applyFoodInd(s) {
+	var filters = generateIn(s);
+	document.getElementById("FOOD_IND").setAttribute("value", filters);
+	$('#FOOD_IND').attr("value", filters);
+}
+$('#FOOD_IND').on('change', function () {
+	var local = [];
+	$('#FOOD_IND option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedFoodInd = local;
+	console.log(selectedFoodInd);
+});
+
+// Group Code Multi-Select Functionality
+var selectedGrpCode = [];
+function applyGrpCode(s) {
+	var filters = generateIn(s);
+	document.getElementById("grp_code").setAttribute("value", filters);
+	$('#grp_code').attr("value", filters);
+}
+$('#grp_code').on('change', function () {
+	var local = [];
+	$('#grp_code option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedGrpCode = local;
+	console.log(selectedGrpCode);
+});
+
+// Inout Indicator Multi-Select Functionality
+var selectedInout = [];
+function applyInout(s) {
+	var filters = generateIn(s);
+	$('#INOUT_IND').attr("value", filters);
+}
+$('#INOUT_IND').on('change', function () {
+	var local = [];
+	$('#INOUT_IND option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedInout = local;
+	console.log(selectedInout);
+});
+
+// Loading Group Multi-Select Functionality
+var selectedLoading = [];
+function applyLoading(s) {
+	var filters = generateIn(s);
+	$('#LOADING_GROUP').attr("value", filters);
+}
+$('#LOADING_GROUP').on('change', function () {
+	var local = [];
+	$('#LOADING_GROUP option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedLoading = local;
+	console.log(selectedLoading);
+});
+
+// Organic Multi-Select Functionality
+var selectedOrg = [];
+function applyOrg(s) {
+	var filters = generateIn(s);
+	document.getElementById("organic_ind").setAttribute("value", filters);
+	$('#organic_ind').attr("value", filters);
+}
+$('#organic_ind').on('change', function () {
+	var local = [];
+	$('#organic_ind option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedOrg = local;
+	console.log(selectedOrg);
+});
+
+// Region Multi-Select Functionality
+var selectedRegion = [];
+function applyRegion(s) {
+	var filters = generateIn(s);
+	document.getElementById("REGION").setAttribute("value", filters);
+	$('#REGION').attr("value", filters);
+}
+$('#REGION').on('change', function () {
+	var local = [];
+	$('#REGION option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedRegion = local;
+	console.log(selectedRegion);
+});
+
+// SCM Multi-Select Functionality
+var selectedSCM = [];
+function applySCM(s) {
+	var filters = generateIn(s);
+	document.getElementById("SCM").setAttribute("value", filters);
+	$('#SCM').attr("value", filters);
+}
+$('#SCM').on('change', function () {
+	var local = [];
+	$('#SCM option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedSCM = local;
+	console.log(selectedSCM);
+});
+
+// Store Multi-Select Functionality
+var selectedStore = [];
+function applyStore(s) {
+	var filters = generateIn(s);
+	document.getElementById("STORE").setAttribute("value", filters);
+	$('#STORE').attr("value", filters);
+}
+$('#STORE').on('change', function () {
+	var local = [];
+	$('#STORE option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedStore = local;
+	console.log(selectedStore);
+});
+
+// VP Multi-Select Functionality
+var selectedVP = [];
+function applyVP(s) {
+	var filters = generateIn(s);
+	$('#VP').attr("value", filters);
+}
+$('#VP').on('change', function () {
+	var local = [];
+	$('#VP option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedVP = local;
+	console.log(selectedVP);
+	getOptionsBuyer(0, selectedVP);
+});
+
+// Dir Multi-Select Functionality
+var selectedDir = [];
+function applyDir(s) {
+	var filters = generateIn(s);
+	document.getElementById("DIRECTOR").setAttribute("value", filters);
+	$('#DIRECTOR').attr("value", filters);
+}
+$('#DIRECTOR').on('change', function () {
+	var local = [];
+	$('#DIRECTOR option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedDir = local;
+	console.log(selectedDir);
+	getOptionsBuyer(1, selectedDir);
+});
+
+// SrM Multi-Select Functionality
+var selectedSrM = [];
+function applySrM(s) {
+	var filters = generateIn(s);
+	document.getElementById("SENIOR_MANAGER").setAttribute("value", filters);
+	$('#SENIOR_MANAGER').attr("value", filters);
+}
+$('#SENIOR_MANAGER').on('change', function () {
+	var local = [];
+	$('#SENIOR_MANAGER option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedSrM = local;
+	console.log(selectedSrM);
+	getOptionsBuyer(2, selectedSrM);
+});
+
+// Buyer Multi-Select Functionality
+var selectedBuyer = [];
+function applyBuyer(s) {
+	var filters = generateIn(s);
+	document.getElementById("BUYER_NAME").setAttribute("value", filters);
+	$('#BUYER_NAME').attr("value", filters);
+}
+$('#BUYER_NAME').on('change', function () {
+	var local = [];
+	$('#BUYER_NAME option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedBuyer = local;
+	console.log(selectedBuyer);
+	getOptionsBuyer(3, selectedBuyer);
+});
+
+// MCH3 Multi-Select Functionality
+var selectedMCH3 = [];
+function applyMCH3(s) {
+	var filters = generateIn(s);
+	document.getElementById("MCH_3_DESC_E").setAttribute("value", filters);
+	$('#MCH_3_DESC_E').attr("value", filters);
+}
+$('#MCH_3_DESC_E').on('change', function () {
+	var local = [];
+	$('#MCH_3_DESC_E option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedMCH3 = local;
+	console.log(selectedMCH3);
+	getOptionsMCH(0, selectedMCH3);
+});
+
+// MCH2 Multi-Select Functionality
+var selectedMCH2 = [];
+function applyMCH2(s) {
+	var filters = generateIn(s);
+	document.getElementById("MCH_2_DESC_E").setAttribute("value", filters);
+	$('#MCH_2_DESC_E').attr("value", filters);
+}
+$('#MCH_2_DESC_E').on('change', function () {
+	var local = [];
+	$('#MCH_2_DESC_E option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedMCH2 = local;
+	console.log(selectedMCH2);
+	getOptionsMCH(1, selectedMCH2);
+});
+
+// MCH1 Multi-Select Functionality
+var selectedMCH1 = [];
+function applyMCH1(s) {
+	var filters = generateIn(s);
+	document.getElementById("MCH_1_DESC_E").setAttribute("value", filters);
+	$('#MCH_1_DESC_E').attr("value", filters);
+}
+$('#MCH_1_DESC_E').on('change', function () {
+	var local = [];
+	$('#MCH_1_DESC_E option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedMCH1 = local;
+	console.log(selectedMCH1);
+	getOptionsMCH(2, selectedMCH1);
+});
+
+// MCH0 Multi-Select Functionality
+var selectedMCH0 = [];
+function applyMCH0(s) {
+	var filters = generateIn(s);
+	document.getElementById("MCH_0_DESC_E").setAttribute("value", filters);
+	$('#MCH_0_DESC_E').attr("value", filters);
+}
+$('#MCH_0_DESC_E').on('change', function () {
+	var local = [];
+	$('#MCH_0_DESC_E option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedMCH0 = local;
+	console.log(selectedMCH0);
+});
+
+// Promo Year Number
+var selectedYear = [];
+function applyYear(s) {
+	var filters = generateIn(s);
+	document.getElementById("PROMO_YR_NUM").setAttribute("value", filters);
+	$('#PROMO_YR_NUM').attr("value", filters);
+}
+$('#PROMO_YR_NUM').on('change', function () {
+	var local = [];
+	$('#PROMO_YR_NUM option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedYear = local;
+	console.log(selectedYear);
+});
+
+// Promo Week Number
+var selectedWeek = [];
+function applyWeek(s) {
+	var filters = generateIn(s);
+	document.getElementById("PROMO_WK_NUM").setAttribute("value", filters);
+	$('#PROMO_WK_NUM').attr("value", filters);
+}
+$('#PROMO_WK_NUM').on('change', function () {
+	var local = [];
+	$('#PROMO_WK_NUM option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedWeek = local;
+	console.log(selectedWeek);
+});
+
+// Corp Year Number
+var selectedCorpYear = [];
+function applyCorpYear(s) {
+	var filters = generateIn(s);
+	document.getElementById("CORP_YR_NUM").setAttribute("value", filters);
+	$('#CORP_YR_NUM').attr("value", filters);
+}
+$('#CORP_YR_NUM').on('change', function () {
+	var local = [];
+	$('#CORP_YR_NUM option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedCorpYear = local;
+	console.log(selectedCorpYear);
+});
+
+// Corp Week Number
+var selectedCorpWeek = [];
+function applyCorpWeek(s) {
+	var filters = generateIn(s);
+	document.getElementById("CORP_WK_NUM").setAttribute("value", filters);
+	$('#CORP_WK_NUM').attr("value", filters);
+}
+$('#CORP_WK_NUM').on('change', function () {
+	var local = [];
+	$('#CORP_WK_NUM option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedCorpWeek = local;
+	console.log(selectedCorpWeek);
+});
+
+// Corp Period Number
+var selectedPeriod = [];
+function applyPeriod(s) {
+	var filters = generateIn(s);
+	document.getElementById("CORP_PD_NUM").setAttribute("value", filters);
+	$('#CORP_PD_NUM').attr("value", filters);
+}
+$('#CORP_PD_NUM').on('change', function () {
+	var local = [];
+	$('#CORP_PD_NUM option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedPeriod = local;
+	console.log(selectedPeriod);
+});
+
+// SKU Status
+var selectedSKU = [];
+function applySKU(s) {
+	var filters = generateIn(s);
+	document.getElementById("SKU_STATUS").setAttribute("value", filters);
+	$('#SKU_STATUS').attr("value", filters);
+}
+$('#SKU_STATUS').on('change', function () {
+	var local = [];
+	$('#SKU_STATUS option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedSKU = local;
+	console.log(selectedSKU);
+});
+
+// Projected Out of Stock
+var selectedProjOOS = [];
+function applyProjOOS(s) {
+	var filters = generateIn(s);
+	document.getElementById("projoos").setAttribute("value", filters);
+	$('#projoos').attr("value", filters);
+}
+$('#projoos').on('change', function () {
+	var local = [];
+	$('#projoos option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedProjOOS = local;
+	console.log(selectedProjOOS);
+});
+
+// Late
+var selectedLate = [];
+function applyLate(s) {
+	var filters = generateIn(s);
+	document.getElementById("Late").setAttribute("value", filters);
+	$('#Late').attr("value", filters);
+}
+$('#Late').on('change', function () {
+	var local = [];
+	$('#Late option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedLate = local;
+	console.log(selectedLate);
+});
+
+
+// DC
+var selectedDC = [];
+function applyDC(s) {
+	var filters = generateIn(s);
+	document.getElementById("SUPL_SITE_NUM").setAttribute("value", filters);
+	$('#SUPL_SITE_NUM').attr("value", filters);
+}
+$('#SUPL_SITE_NUM').on('change', function () {
+	var local = [];
+	$('#SUPL_SITE_NUM option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedDC = local;
+	console.log(selectedLate);
+});
+
+// Buyer Number
+var selectedBuyerNum = [];
+function applyBuyerNum(s) {
+	var filters = generateIn(s);
+	document.getElementById("BUYER_NUMBER").setAttribute("value", filters);
+	$('#BUYER_NUMBER').attr("value", filters);
+}
+$('#BUYER_NUMBER').on('change', function () {
+	var local = [];
+	$('#BUYER_NUMBER option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedBuyerNum = local;
+	console.log(selectedBuyerNum);
+});
+
+// Exception Type
+var selectedExceptionType = [];
+function applyExceptionType(s) {
+	var filters = generateIn(s);
+	document.getElementById("EXCEPTION_TYPE").setAttribute("value", filters);
+	$('#EXCEPTION_TYPE').attr("value", filters);
+}
+$('#EXCEPTION_TYPE').on('change', function () {
+	var local = [];
+	$('#EXCEPTION_TYPE option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedExceptionType = local;
+	console.log(selectedExceptionType);
+});
+
+// Generic
+var selectedGeneric = [];
+function applyGeneric(s) {
+	var filters = generateIn(s);
+	document.getElementById("generic_ind").setAttribute("value", filters);
+	$('#generic_ind').attr("value", filters);
+}
+$('#generic_ind').on('change', function () {
+	var local = [];
+	$('#generic_ind option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedGeneric = local;
+	console.log(selectedGeneric);
+});
+
+// compliance_BU_num
+var selectedCOMPLIANCE_BU_NUM = [];
+function applyCOMPLIANCE_BU_NUM(s) {
+	var filters = generateIn(s);
+	document.getElementById("compliance_BU_num").setAttribute("value", filters);
+	$('#compliance_BU_num').attr("value", filters);
+}
+$('#compliance_BU_num').on('change', function () {
+	var local = [];
+	$('#compliance_BU_num option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedCOMPLIANCE_BU_NUM = local;
+	console.log(selectedCOMPLIANCE_BU_NUM);
+	getOptionsComplianceBU(1, selectedCOMPLIANCE_BU_NUM);
+});
+
+// compliance_BU_name
+var selectedCOMPLIANCE_BU_NAME = [];
+function applyCOMPLIANCE_BU_NAME(s) {
+	var filters = generateIn(s);
+	document.getElementById("compliance_BU_name").setAttribute("value", filters);
+	$('#compliance_BU_name').attr("value", filters);
+}
+$('#compliance_BU_name').on('change', function () {
+	var local = [];
+	$('#compliance_BU_name option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedCOMPLIANCE_BU_NAME = local;
+	console.log(selectedCOMPLIANCE_BU_NAME);
+	getOptionsComplianceBU(0, selectedCOMPLIANCE_BU_NAME);
+});
+
+//julia vend_num
+var selectedVEND_NUM = [];
+function applyVEND_NUM(s) {
+	var filters = generateIn(s);
+	document.getElementById("vend_num").setAttribute("value", filters);
+	$('#vend_num').attr("value", filters);
+}
+$('#vend_num').on('change', function () {
+	var local = [];
+	$('#vend_num option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedVEND_NUM = local;
+	console.log(selectedVEND_NUM);
+	getOptionsVend(1, selectedVEND_NUM);
+});
+
+//julia vend_nm
+var selectedVEND_NM = [];
+function applyVEND_NM(s) {
+	var filters = generateIn(s);
+	document.getElementById("vend_nm").setAttribute("value", filters);
+	$('#vend_nm').attr("value", filters);
+}
+$('#vend_nm').on('change', function () {
+	var local = [];
+	$('#vend_nm option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedVEND_NM = local;
+	console.log(selectedVEND_NM);
+	getOptionsVend(0, selectedVEND_NM);
+});
+
+// ORD_TY_CD
+var selectedORD_TY_CD = [];
+function applyORD_TY_CD(s) {
+	var filters = generateIn(s);
+	document.getElementById("ORD_TY_CD").setAttribute("value", filters);
+	$('#ORD_TY_CD').attr("value", filters);
+}
+$('#ORD_TY_CD').on('change', function () {
+	var local = [];
+	$('#ORD_TY_CD option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedORD_TY_CD = local;
+	console.log(selectedORD_TY_CD);
+});
+
+// ETHNIC_ORIGIN_CD
+var selectedETHNIC_ORIGIN_CD = [];
+function applyETHNIC_ORIGIN_CD(s) {
+	var filters = generateIn(s);
+	document.getElementById("ETHNIC_ORIGIN_CD").setAttribute("value", filters);
+	$('#ETHNIC_ORIGIN_CD').attr("value", filters);
+}
+$('#ETHNIC_ORIGIN_CD').on('change', function () {
+	var local = [];
+	$('#ETHNIC_ORIGIN_CD option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedETHNIC_ORIGIN_CD = local;
+	console.log(selectedETHNIC_ORIGIN_CD);
+});
+
+// Calendar Type Multi-Select Functionality
+var selectedCalType = [];
+function applyCalType(s) {
+	var filters = generateIn(s);
+	document.getElementById("CAL_TYPE").setAttribute("value", filters);
+	$('#CAL_TYPE').attr("value", filters);
+}
+$('#CAL_TYPE').on('change', function () {
+	var local = [];
+	$('#CAL_TYPE option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedCalType = local;
+	console.log(selectedCalType);
+});
+
+// TRANSMODE
+var selectedTRANSMODE = [];
+function applyTRANSMODE(s) {
+//	console.log(s);
+	if (s[0]) {
+		if (s[0].includes("\n")) {
+			console.log("newline checked");
+			s[0] = s[0].replaceAll('\n',' ');
+		}
+		if (s[0].includes(", ")) {
+			inputs = s[0].split(", ");
+		} else if (s[0].includes(",")) {
+			inputs = s[0].split(",");
+		} else if (!s[0].includes(",")) {
+			inputs = s[0].split(" ");
+		}
+	} else {
+		inputs = ''
+	}
+	if (typeof(inputs) != 'string') {
+		let blanks = [];
+		for(let i = 0; i < inputs.length; i++) {
+			if (inputs[i].trim() == '') {
+				blanks.push(i);
+			}
+			inputs[i] = inputs[i].trim();
+		}
+		for (let i = 0; i < blanks.length; i++) {
+			inputs.splice(blanks[i], 1);
+		}
+	}
+//	console.log(inputs);
+	var filters = generateIn(inputs);
+	document.getElementById("TRANSMODE").setAttribute("value", filters);
+	$('#TRANSMODE').attr("value", filters);
+}
+$('#TRANSMODE').on('change', function () {
+	var local = [];
+	local.push(	$('#TRANSMODE').val());
+	selectedTRANSMODE = local;
+//	console.log(selectedTRANSMODE);
+});
+
+// CAL
+var selectedCAL = [];
+function applyCAL(s) {
+	console.log(s);
+	if (s[0]) {
+		if (s[0].includes("\n")) {
+			console.log("newline checked");
+			s[0] = s[0].replaceAll('\n',' ');
+		}
+		if (s[0].includes(", ")) {
+			inputs = s[0].split(", ");
+		} else if (s[0].includes(",")) {
+			inputs = s[0].split(",");
+		} else if (!s[0].includes(",")) {
+			inputs = s[0].split(" ");
+		}
+	} else {
+		inputs = ''
+	}
+	if (typeof(inputs) != 'string') {
+		let blanks = [];
+		for(let i = 0; i < inputs.length; i++) {
+			if (inputs[i].trim() == '') {
+				blanks.push(i);
+			}
+			inputs[i] = inputs[i].trim();
+		}
+		for (let i = 0; i < blanks.length; i++) {
+			inputs.splice(blanks[i], 1);
+		}
+	}
+//	console.log(inputs);
+	var filters = generateIn(inputs);
+	document.getElementById("CAL").setAttribute("value", filters);
+	$('#CAL').attr("value", filters);
+}
+$('#CAL').on('change', function () {
+	var local = [];
+	local.push(	$('#CAL').val());
+	selectedCAL = local;
+//	console.log(selectedCAL);
+});
+
+// SOURCE
+var selectedSOURCE = [];
+function applySOURCE(s) {
+	var filters = generateIn(s);
+	document.getElementById("SOURCE").setAttribute("value", filters);
+	$('#SOURCE').attr("value", filters);
+}
+$('#SOURCE').on('change', function () {
+	var local = [];
+	$('#SOURCE option:selected').each(function (i, selectedOptions) {
+		local.push($(selectedOptions).text());
+	});
+	selectedSOURCE = local;
+	console.log(selectedSOURCE);
+});
+
+
+
+// Clear Filters Button on Filters Pane Functionality. Works on all pages.
+$('#clear').on("click", function () {
+
+	selectedActive = [];
+	$("#ACTIVE_IND").val([]).selectpicker('refresh');
+	selectedBanner = [];
+	$("#BANNER").val([]).selectpicker('refresh');
+	selectedBrand = [];
+	$("#brand_type_code").val([]).selectpicker('refresh');
+	selectedCompany = [];
+	$("#COMPANY").val([]).selectpicker('refresh');
+	selectedDivision = [];
+	$("#DIVISION").val([]).selectpicker('refresh');
+	selectedEthnic = [];
+	$("#ethnic_flag_desc_en").val([]).selectpicker('refresh');
+	selectedFoodInd = [];
+	$("#FOOD_IND").val([]).selectpicker('refresh');
+	selectedGrpCode = [];
+	$("#grp_code").val([]).selectpicker('refresh');
+	selectedInout = [];
+	$("#INOUT_IND").val([]).selectpicker('refresh');
+	selectedActive = [];
+	$("#ACTIVE_IND").val([]).selectpicker('refresh');
+	selectedOrg = [];
+	$("#organic_ind").val([]).selectpicker('refresh');
+	selectedLoading = [];
+	$("#LOADING_GROUP").val([]).selectpicker('refresh');
+	selectedRegion = [];
+	$("#REGION").val([]).selectpicker('refresh');
+	selectedSCM = [];
+	$("#SCM").val([]).selectpicker('refresh');
+	selectedStore = [];
+	$("#STORE").val([]).selectpicker('refresh');
+	selectedSKU = [];
+	$("#SKU_STATUS").val([]).selectpicker('refresh');
+	selectedProjOOS = [];
+	$("#projoos").val([]).selectpicker('refresh');
+	selectedLate = [];
+	$("#Late").val([]).selectpicker('refresh');
+
+	selectedVP = [];
+	$("#VP").val([]).selectpicker('refresh');
+	selectedDir = [];
+	$("#DIRECTOR").val([]).selectpicker('refresh');
+	selectedSrM = [];
+	$("#SENIOR_MANAGER").val([]).selectpicker('refresh');
+	selectedBuyer = [];
+	$("#BUYER_NAME").val([]).selectpicker('refresh');
+	selectedBuyerNum = [];
+	$("#BUYER_NUMBER").val([]).selectpicker('refresh');
+
+	selectedExceptionType = [];
+	$("#EXCEPTION_TYPE").val([]).selectpicker('refresh');
+
+	selectedMCH3 = [];
+	$("#MCH_3_DESC_E").val([]).selectpicker('refresh');
+	selectedMCH2 = [];
+	$("#MCH_2_DESC_E").val([]).selectpicker('refresh');
+	selectedMCH1 = [];
+	$("#MCH_1_DESC_E").val([]).selectpicker('refresh');
+	selectedMCH0 = [];
+	$("#MCH_0_DESC_E").val([]).selectpicker('refresh');
+
+	selectedYear = [];
+	$("#PROMO_YR_NUM").val([]).selectpicker('refresh');
+	selectedWeek = [];
+	$("#PROMO_WK_NUM").val([]).selectpicker('refresh');
+	selectedPeriod = [];
+	$("#CORP_PD_NUM").val([]).selectpicker('refresh');
+	selectedCorpYear = [];
+	$("#CORP_YR_NUM").val([]).selectpicker('refresh');
+
+
+	selectedDC = [];
+	$("#SUPL_SITE_NUM").val([]).selectpicker('refresh');
+
+	selectedGeneric = [];
+	$("#generic_ind").val([]).selectpicker('refresh');
+
+	selectedCOMPLIANCE_BU_NUM = [];
+	$("#compliance_BU_num").val([]).selectpicker('refresh'); // changed from BU_NUM
+	selectedCOMPLIANCE_BU_NAME = []; 
+	$("#compliance_BU_name").val([]).selectpicker('refresh');
+	selectedVEND_NUM = []; // julia
+	$("#vend_num").val([]).selectpicker('refresh');	
+	selectedVEND_NM = []; // julia
+	$("#vend_nm").val([]).selectpicker('refresh');	
+	selectedORD_TY_CD = [];
+	$("#ORD_TY_CD").val([]).selectpicker('refresh');
+	selectedETHNIC_ORIGIN_CD = [];
+	$("#ETHNIC_ORIGIN_CD").val([]).selectpicker('refresh');
+	selectedTRANSMODE = [];
+	$("#TRANSMODE").val('');
+	selectedCAL = [];
+	$("#CAL").val('');
+	selectedCalType = [];
+	$("#CAL_TYPE").val([]).selectpicker('refresh');
+	selectedSOURCE = [];
+	$("#SOURCE").val([]).selectpicker('refresh');
+
+	getOptionsBuyer(0, selectedVP);
+	getOptionsBuyer(1, selectedDir);
+	getOptionsBuyer(2, selectedSrM);
+	getOptionsBuyer(3, selectedBuyer);
+
+	getOptionsMCH(0, selectedMCH3);
+	getOptionsMCH(1, selectedMCH2);
+	getOptionsMCH(2, selectedMCH1);
+	getOptionsMCH(3, selectedMCH0);
+
+	getOptionsLoc(0, selectedDivision);
+	getOptionsLoc(1, selectedBanner);
+	getOptionsLoc(2, selectedStore);
+
+	getOptionsComplianceBU(0, selectedCOMPLIANCE_BU_NAME);
+	getOptionsComplianceBU(1, selectedCOMPLIANCE_BU_NUM);
+
+	getOptionsVend(0, selectedVEND_NM);
+	getOptionsVend(1, selectedVEND_NUM);
+
+	// clearFilters();
+});
+
+// This function will do all the work required to successfully apply filters
+// the order of operations are: Closing the pane 
+//-> Applying all filters to their corresponding dropdown elements 
+//-> Delete the old cookie if there is one and create a new cookie corresponding to the selected valid filters (more info on the cookies fns)
+//-> Update the links according to whatever page you're on
+//-> Update the applied filters buttons on the header to show which filters are active (they allow users to get rid of filters by clicking on the buttons as well)
+//-> Put the loading graphic back on the graphs to let the user know the graphs are being remade to accomodate the new applied filters
+//-> *the function to do this is not defined in this file* Running all the necessary xhttp requests and queries from the js file present in every metric folder 
+//-> (for graphs pages, you can find the function defined in the index.js *might not necessarily be named that* found in each of the files. 
+//-> For details pages, it should be the js file not within any of the subfolders within the details folder)
+//-> *a separate function, updateExceptions(), is defined separately to send necessary xhttp requests to update the exceptions button and popup table
+//-> this is to differentiate the process, it is defined with the refreshGraphs() function in the same page
+// This will work on all pages
+function applyFilters() {
+	closeFilters();
+
+	applyActive(selectedActive);
+	applyBanner(selectedBanner);
+	applyBrand(selectedBrand);
+	applyCompany(selectedCompany);
+	applyEthnic(selectedEthnic);
+	applyDivision(selectedDivision);
+	applyInout(selectedInout);
+	applyFoodInd(selectedFoodInd);
+	applyGrpCode(selectedGrpCode);
+	applyOrg(selectedOrg);
+	applyRegion(selectedRegion);
+	applySCM(selectedSCM);
+	applyStore(selectedStore);
+	applySKU(selectedSKU);
+	applyProjOOS(selectedProjOOS);
+	applyLate(selectedLate);
+	applyDC(selectedDC);
+	applyGeneric(selectedGeneric);
+	applyLoading(selectedLoading);
+	applyCOMPLIANCE_BU_NAME(selectedCOMPLIANCE_BU_NAME); 
+	applyCOMPLIANCE_BU_NUM(selectedCOMPLIANCE_BU_NUM);
+	applyVEND_NUM(selectedVEND_NUM); // julia
+	applyVEND_NM(selectedVEND_NM) // julia
+	applyORD_TY_CD(selectedORD_TY_CD);
+	applyETHNIC_ORIGIN_CD(selectedETHNIC_ORIGIN_CD);
+	applyCalType(selectedCalType);
+	applyTRANSMODE(selectedTRANSMODE);
+	applyCAL(selectedCAL);
+	applySOURCE(selectedSOURCE);
+
+	if (selectedYear.length == 0 || selectedWeek.length == 0) {
+		selectedYear = [];
+		selectedWeek = [];
+	}
+	applyYear(selectedYear);
+	applyWeek(selectedWeek);
+	applyPeriod(selectedPeriod);
+	applyCorpYear(selectedCorpYear);
+	applyCorpWeek(selectedCorpWeek);
+
+	applyVP(selectedVP);
+	applyDir(selectedDir);
+	applySrM(selectedSrM);
+	applyBuyer(selectedBuyer);
+	applyBuyerNum(selectedBuyerNum);
+	applyExceptionType(selectedExceptionType);
+	
+
+	applyMCH3(selectedMCH3);
+	applyMCH2(selectedMCH2);
+	applyMCH1(selectedMCH1);
+	applyMCH0(selectedMCH0);
+	
+
+	generateGetString(); 	// collect the filters minus dateStart and dateEnd and build a get string for filtering the current page 
+	if (document.cookie.indexOf(pageID.split("_")[0] + '=') != -1) {
+		deleteCookie();
+	}
+	makeCookie();
+//	console.log("conditional : " + ['promos', 'inboundoutbound'].includes(pageID.split("_")[0]));
+//	console.log(pageID.split("_")[0]);
+	if (pageID.split("_").length == 1) {
+		updateLinks(); 		// update the get parameters in the links
+	} else if (['promos', 'dcsaplive', 'frexempindpd', 'frexemptdept', 'frexemptmch0', 'mch0toscmmapping', 'vendorwatchlist', 'lineexceptions', 'lineexceptionssum', 'fourweeksl', 'vendorpenaltysum', 'fillrateexemptions', 'tenweekshorts', 'calendars'].includes(pageID.split("_")[0])) { // these pages don't use date range filter so needs special case
+		if (pageID.split("_").length == 2) {
+			console.log('special case');
+			updateLinks();
+		} else { 				//details pages
+			if (['dcclosures', 'adhocclosures', 'visual'].includes(pageID.split("_")[2])) { //case for individual details pages that need dates for metrics that don't usually need put the last identifier aka [2]
+				updateDates(); 		// adds dateStart and dateEnd to the GetString
+			}
+			updateCSVdl();
+		}
+	} else if (pageID.split("_").length == 2) {
+		updateDates(); 		// adds dateStart and dateEnd to the GetString
+		updateLinks(); 		// update the get parameters in the links *reliant on being run before adding dates to the getString
+	} else { 
+		if (!['inbound', 'inbound2', 'inboundvend', 'outbound', 'outbound2', 'palletest', 'palletest2', 'pallet', 'pallet2'].includes(pageID.split("_")[2])) {//details pages in metrics that have date filters in graphs page but not in details pages
+			updateDates(); 		// adds dateStart and dateEnd to the GetString
+		}
+		updateCSVdl();      // updates the onclick event for the download buttons in the details pages. the button is defined in headers/download_header.php. This function is used to solve the issue of the dl button not working after a set of filters are applied
+	}
+	appliedFilters(); 		// used to update the applied filters buttons
+	applyDefaultFilters();  // make sure to reinsert default promo dates
+	resetGraphs(); 			// display the loading graphs
+	refreshGraphs(); 		// refresh relevant graphs. This function will be defined in another js file specific to the page
+}
+
+// This function is used to apply the filters from the graphs; it is the drill down function
+// is it only called in the graph onclick functions located in the index.js *might not be called that universally* 
+// in each of the main metric folders
+function applyGraphFilters() {
+	generateGetString();
+	if (document.cookie.indexOf(pageID.split("_")[0] + '=') != -1) {
+		deleteCookie();
+	}
+	makeCookie();
+
+	if (pageID.split("_").length == 1) {
+			updateLinks(); 		// update the get parameters in the links
+		
+	} else if (pageID.split("_").length == 2) {
+		if (![''].includes(pageID.split("_")[0])) { // apply dates on graph push
+			updateDates(); 		// adds dateStart and dateEnd to the GetString
+		}
+		updateLinks(); 		// update the get parameters in the links *reliant on being run before adding dates to the getString
+	} else { //details pages
+		if (![''].includes(pageID.split("_")[0])) { // apply dates on graph push
+			updateDates(); 		// adds dateStart and dateEnd to the GetString
+		}
+	}
+	appliedFilters(); 		// used to update the applied filters buttons
+	applyDefaultFilters();
+	resetGraphs(); 			// display the loading graphs
+	refreshGraphs(); 		// refresh relevant graphs. This function will be defined in another js file specific to the page
+}
+
+// This function is used to show the filters pane and hide the date range picker if the page is in FrontPage
+// This is called on all pages
+function showFilters() {
+	document.getElementById("filters").style.display = "block";
+	if (pageID.split("_")[0] == 'frontpage') { // conditional on the current page being the main page
+		document.getElementById("reportrange").style.display = "none"; // hide the daterange
+	}
+}
+
+// This function is used to hide the filters pane
+// This is called on all pages
+function closeFilters() {
+	document.getElementById("filters").style.display = "none";
+}
+
+// This functions resets the graphs and exceptions for both the Front Page, all Graphs pages and Details pages
+// This is called on all pages
+function resetGraphs() {
+	// NOTE: must clear innerHTML first before applying the loading GIF
+	if (pageID.split("_").length == 3) {
+		if (pageID.split("_")[2] == 'inputform') {
+			// complianceinput input pages
+
+		} else {
+			// all other details pages
+			document.getElementById("chart").innerHTML = "";
+			document.getElementById("chart").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+	} else if (pageID.split("_").length == 2) {
+		// exceptions overview page
+		if (pageID.split("_")[0] == 'exceptions') {
+			document.getElementById("missingstoresourcing").innerHTML = "";
+			document.getElementById("missingstoresourcing").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("missingdcsourcing").innerHTML = "";
+			document.getElementById("missingdcsourcing").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("orderexceptions").innerHTML = "";
+			document.getElementById("orderexceptions").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("receivingdiscrepancies").innerHTML = "";
+			document.getElementById("receivingdiscrepancies").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("skuexception").innerHTML = "";
+			document.getElementById("skuexception").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ddeexception").innerHTML = "";
+			// document.getElementById("ddeexception").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		// all graph pages 		
+		if (pageID.split("_")[0] == 'servicelevel') {
+			// servicelevel index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("brand").innerHTML = "";
+			document.getElementById("brand").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("org").innerHTML = "";
+			document.getElementById("org").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("ec").innerHTML = "";
+			document.getElementById("ec").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("num").innerHTML = "";
+			document.getElementById("num").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("dc").innerHTML = "";
+			document.getElementById("dc").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'inventory') {
+			// inventory index page
+			// document.getElementById("ExceptionText").innerHTML = "";
+			document.getElementById("summ").innerHTML = "";
+			document.getElementById("dc").innerHTML = "";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("active").innerHTML = "";
+			document.getElementById("inout").innerHTML = "";
+			document.getElementById("brand").innerHTML = "";
+			document.getElementById("abc").innerHTML = "";
+
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("summ").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("dc").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("active").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("inout").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("brand").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("abc").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'availability') {
+			// availability index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("brand").innerHTML = "";
+			document.getElementById("brand").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("num").innerHTML = "";
+			document.getElementById("num").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("banner").innerHTML = "";
+			document.getElementById("banner").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'firmflags') {
+			// firmflags index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("s1s2").innerHTML = "";
+			document.getElementById("s1s2").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("shorts").innerHTML = "";
+			document.getElementById("shorts").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'orderexception') {
+			// orderexception index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("subexception").innerHTML = "";
+			document.getElementById("subexception").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'missingstoresourcing') {
+			// missingdcsourcing index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("subexception").innerHTML = "";
+			document.getElementById("subexception").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("banner").innerHTML = "";
+			document.getElementById("banner").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'missingdcsourcing') {
+			// missingdcsourcing index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("subexception").innerHTML = "";
+			document.getElementById("subexception").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'skuexception') {
+			// skuexception index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("subexception").innerHTML = "";
+			document.getElementById("subexception").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'receivingdiscrepancies') {
+			// skuexception index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer2").innerHTML = "";
+			document.getElementById("buyer2").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("yoy2").innerHTML = "";
+			document.getElementById("yoy2").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'ipfrusage') {
+			// skuexception index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("loadsum").innerHTML = "";
+			document.getElementById("loadsum").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyerusage").innerHTML = "";
+			document.getElementById("buyerusage").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("r3").innerHTML = "";
+			document.getElementById("r3").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("pureusage").innerHTML = "";
+			document.getElementById("pureusage").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("allloads").innerHTML = "";
+			document.getElementById("allloads").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+
+			document.getElementById("manualloads").innerHTML = "";
+			document.getElementById("manualloads").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("nonapprovedloads").innerHTML = "";
+			document.getElementById("nonapprovedloads").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("failedorders").innerHTML = "";
+			document.getElementById("failedorders").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+
+		}
+		else if (pageID.split("_")[0] == 'dno') {
+			// dno index page
+			document.getElementById("wof").innerHTML = "";
+			document.getElementById("wof").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("counts").innerHTML = "";
+			document.getElementById("counts").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'exec') {
+			// exec index page
+			document.getElementById("rept_nm").innerHTML = "";
+			document.getElementById("rept_nm").innerHTML = "Executive Summary";
+			document.getElementById("slv_reg").innerHTML = "";
+			document.getElementById("slv_reg").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("slv_mch").innerHTML = "";
+			document.getElementById("slv_mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("flag").innerHTML = "";
+			document.getElementById("flag").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("avail").innerHTML = "";
+			document.getElementById("avail").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("stale").innerHTML = "";
+			document.getElementById("stale").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'dsdfillrate') {
+			// fillrate page
+			document.getElementById("num").innerHTML = "";
+			document.getElementById("num").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			//document.getElementById("dc").innerHTML = "";
+			//document.getElementById("dc").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("brand").innerHTML = "";
+			document.getElementById("brand").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("banner").innerHTML = "";
+			document.getElementById("banner").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			//document.getElementById("org").innerHTML = "";
+			//document.getElementById("org").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			//document.getElementById("buyer").innerHTML = "";
+			//document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			
+		}
+		else if (pageID.split("_")[0] == 'dde') {
+			// dde index page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'promos') {
+			// promo page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			// document.getElementById("ExceptionText").innerHTML = "";
+			// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'poconfirmation') {
+			// poconfirmation page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		}
+		else if (pageID.split("_")[0] == 'schedrcpts') {
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyerlate").innerHTML = "";
+			document.getElementById("buyerlate").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendorlate").innerHTML = "";
+			document.getElementById("vendorlate").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mchlate").innerHTML = "";
+			document.getElementById("mchlate").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("regionlate").innerHTML = "";
+			document.getElementById("regionlate").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'staledate') {
+			// staledate page
+			document.getElementById("summ").innerHTML = "";
+			document.getElementById("summ").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("dc").innerHTML = "";
+			document.getElementById("dc").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("brand").innerHTML = "";
+			document.getElementById("brand").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'dsisum') {
+			// dsisum page
+			document.getElementById("bucket").innerHTML = "";
+			document.getElementById("bucket").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'nearexpiryskus') {
+			// nearexpiryskus page
+			document.getElementById("summ").innerHTML = "";
+			document.getElementById("summ").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("region").innerHTML = "";
+			document.getElementById("region").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendor").innerHTML = "";
+			document.getElementById("vendor").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("brand").innerHTML = "";
+			document.getElementById("brand").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'workbenchtool') {
+			// workbenchtool page
+			document.getElementById("chart").innerHTML = "";
+			document.getElementById("chart").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'seasonalcleaningprocess') {
+			// seasonalcleaningprocess page
+			document.getElementById("chart").innerHTML = "";
+			document.getElementById("chart").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'LRRStockExceptions') {
+			// LRRStockExceptions page
+			document.getElementById("chart").innerHTML = "";
+			document.getElementById("chart").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'inboundoutbound') {
+			// inboundoutbound page
+			document.getElementById("yoy").innerHTML = "";
+			document.getElementById("yoy").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("buyer").innerHTML = "";
+			document.getElementById("buyer").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("dc").innerHTML = "";
+			document.getElementById("dc").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("total").innerHTML = "";
+			document.getElementById("total").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mch").innerHTML = "";
+			document.getElementById("mch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendorin").innerHTML = "";
+			document.getElementById("vendorin").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("vendorout").innerHTML = "";
+			document.getElementById("vendorout").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'dcsaplive') {
+			// dcsaplive page
+			document.getElementById("table").innerHTML = "";
+			document.getElementById("table").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'buyerworkflow') {
+			// lineexceptions pageF
+			document.getElementById("buyerworkflow_link").innerHTML = "";
+			document.getElementById("buyerworkflow_link").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'uom') {
+			// lineexceptions pageF
+			document.getElementById("uom_graph").innerHTML = "";
+			document.getElementById("uom_graph").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'lineexceptions') {
+			// lineexceptions page
+			if (pageID.split("_")[1] != 'uploadform') {
+				document.getElementById("table").innerHTML = "";
+				document.getElementById("table").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			}
+		} else if (pageID.split("_")[0] == 'lineexceptionssum') {
+			// lineexceptions page
+			document.getElementById("table").innerHTML = "";
+			document.getElementById("table").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'mch0toscmmapping') {
+			// mch0 to scm mapping page
+			document.getElementById("table").innerHTML = "";
+			document.getElementById("table").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'fourweeksl') {
+			// fourweeksl page
+			document.getElementById("table").innerHTML = "";
+			document.getElementById("table").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'vendorpenaltysum') {
+			// vendorpenaltysum page
+			document.getElementById("table").innerHTML = "";
+			document.getElementById("table").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'tenweekshorts') {
+			// tenweekshorts page
+			document.getElementById("DCshorts").innerHTML = "";
+			document.getElementById("DCshorts").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("VENDshorts").innerHTML = "";
+			document.getElementById("VENDshorts").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("DCmch3").innerHTML = "";
+			document.getElementById("DCmch3").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("VENDmch3").innerHTML = "";
+			document.getElementById("VENDmch3").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("DCmch2").innerHTML = "";
+			document.getElementById("DCmch2").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("VENDmch2").innerHTML = "";
+			document.getElementById("VENDmch2").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("DCmch1").innerHTML = "";
+			document.getElementById("DCmch1").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("VENDmch1").innerHTML = "";
+			document.getElementById("VENDmch1").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("DCmch0").innerHTML = "";
+			document.getElementById("DCmch0").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("VENDmch0").innerHTML = "";
+			document.getElementById("VENDmch0").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'badsetting') {
+			// badsetting page
+			document.getElementById("dsi").innerHTML = "";
+			document.getElementById("dsi").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("dsiinterbranch").innerHTML = "";
+			document.getElementById("dsiinterbranch").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("safetystock").innerHTML = "";
+			document.getElementById("safetystock").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("supplysource").innerHTML = "";
+			document.getElementById("supplysource").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("loadtime").innerHTML = "";
+			document.getElementById("loadtime").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("uomissues").innerHTML = "";
+			document.getElementById("uomissues").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("circularsourcing").innerHTML = "";
+			document.getElementById("circularsourcing").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("flowskumoq").innerHTML = "";
+			document.getElementById("flowskumoq").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("planningexceptions").innerHTML = "";
+			document.getElementById("planningexceptions").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("autoapproveissues").innerHTML = "";
+			document.getElementById("autoapproveissues").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("mcdexceptions").innerHTML = "";
+			document.getElementById("mcdexceptions").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("e4400").innerHTML = "";
+			document.getElementById("e4400").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'ldeforecasterror') {
+			document.getElementById("effective").innerHTML = "";
+			document.getElementById("effective").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+			document.getElementById("lde").innerHTML = "";
+			document.getElementById("lde").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		} else if (pageID.split("_")[0] == 'calendars') {
+			if (pageID.split("_")[2] == 'visual') {
+				document.getElementById("left_content").innerHTML = "";
+				document.getElementById("left_content").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+
+				document.getElementById("page_title").innerHTML = "";
+				document.getElementById("chart").innerHTML = "";
+			} else {
+				const graphs = document.getElementsByClassName("graph");
+				for (let i = 0; i < graphs.length; i++) {
+					graphs[i].innerHTML = "";
+					graphs[i].innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+				}
+			}
+		}
+	} else {
+		// front page 
+		document.getElementById("sl").innerHTML = "";
+		document.getElementById("sl").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		document.getElementById("inv").innerHTML = "";
+		document.getElementById("inv").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		document.getElementById("avail").innerHTML = "";
+		document.getElementById("avail").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		document.getElementById("ff").innerHTML = "";
+		document.getElementById("ff").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		document.getElementById("sd").innerHTML = "";
+		document.getElementById("sd").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		// document.getElementById("ExceptionText").innerHTML = "";
+		// document.getElementById("ExceptionText").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+		document.getElementById("ipfrusage").innerHTML = "";
+		document.getElementById("ipfrusage").innerHTML = "<img src='/images/loading.gif' alt='Loading'>";
+
+	}
+}
+
+// The following 2 functions are for applied filters buttons
+
+// parseQuery(queryString = Str) => Produces Object
+// parses the URL query (i.e.: ?&DateStart=2020-03-05&DateEnd=2021-12-12) and returns them as an object 
+// like { DateStart: "2020-03-05", DateEnd: "2021-12-12", Region: "('ON', 'AT')" }
+// Used only in the appliedFilters function to parse the current Output query for the applied filters buttons
+function parseQuery(queryString) {
+	var query = {};
+	var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
+	for (var i = 0; i < pairs.length - 1; i++) {
+		if (!pairs[i + 1].includes('=')) {
+			pairs[i] = pairs[i] + pairs[i + 1];
+			pairs.splice(i + 1, 1);
+		}
+	}
+	for (var i = 0; i < pairs.length; i++) {
+		var pair = pairs[i].split('=');
+		query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+	}
+	return query;
+}
+
+// populates the applied filters buttons that show which filters are currently applied
+// This function is called in all pages
+function appliedFilters() {
+
+	var input = parseQuery(document.getElementById("Output").value);
+
+	document.getElementById("applied_filters").innerHTML = "Active Filters: ";
+	for (key in input) {
+		if (input[key] != null && input[key] != '') {
+			var trimmed = input[key].replace("(", '');
+			var trimmed = trimmed.replace(/[']+/g, '');
+			var trimmed = trimmed.replace(")", '');
+			if (key == "DateStart" || key == "DateEnd" || key == "PROMO_WK_NUM" || key == "PROMO_YR_NUM" || key == "CORP_WK_NUM" || key == "CORP_YR_NUM" || key == "CORP_PD_NUM") {
+				document.getElementById('applied_filters').innerHTML += '<button type="button" class="btn btn-outline-light btn-sm mx-0">' + trimmed + '</button>';
+			} else {
+				document.getElementById('applied_filters').innerHTML += '<button type="button" class="btn btn-outline-light btn-sm mx-0" onclick="drillUp(this)">' + trimmed + "&ensp; &#215;" + '</button>';
+			}
+		}
+	}
+
+}
+
+// drillUp(appliedButton = Button Object) => null
+// This function removes the lowest level hierachy filter
+// this is the onclick function for the buttons defined in applied filters
+function drillUp(appliedButton) {
+	var applied = appliedButton.innerHTML;
+	var trimmedOff = applied.slice(0, -3);
+	var trimmedOff = trimmedOff.replace("amp;", '');
+	var outputString = document.getElementById("Output").value;
+	var parsedOutput = parseQuery(outputString);
+	for (key in parsedOutput) {
+		var trimmed = parsedOutput[key].replace("(", '');
+		var trimmed = trimmed.replace(")", '');
+		var trimmed = trimmed.replace(/[']+/g, '');
+		if (trimmed == trimmedOff) {
+			var filter = '#' + key;
+			$(filter).val([]).selectpicker('refresh');
+			if (key == "BANNER") {
+				selectedBanner = [];
+			} else if (key == "brand_type_code") {
+				selectedBrand = [];
+			} else if (key == "COMPANY") {
+				selectedCompany = [];
+			} else if (key == "ethnic_flag_desc_en") {
+				selectedEthnic = [];
+			} else if (key == "DIVISION") {
+				selectedDivision = [];
+			} else if (key == "grp_code") {
+				selectedGrpCode = [];
+			} else if (key == "organic_ind") {
+				selectedOrg = [];
+			} else if (key == "REGION") {
+				selectedRegion = [];
+			} else if (key == "SCM") {
+				selectedSCM = [];
+			} else if (key == "STORE") {
+				selectedStore = [];
+			} else if (key == "VP") {
+				selectedVP = [];
+			} else if (key == "DIRECTOR") {
+				selectedDir = [];
+			} else if (key == "SENIOR_MANAGER") {
+				selectedSrM = [];
+			} else if (key == "BUYER_NAME") {
+				selectedBuyer = [];
+			} else if (key == "MCH_3_DESC_E") {
+				selectedMCH3 = [];
+			} else if (key == "MCH_2_DESC_E") {
+				selectedMCH2 = [];
+			} else if (key == "MCH_1_DESC_E") {
+				selectedMCH1 = [];
+			} else if (key == "MCH_0_DESC_E") {
+				selectedMCH0 = [];
+			} else if (key == "CORP_PD_NUM") {
+				selectedPeriod = [];
+			} else if (key == "CORP_YR_NUM") {
+				selectedCorpYear = [];
+			} else if (key == "CORP_WK_NUM") {
+				selectedCorpWeek = [];
+			} else if (key == "PROMO_YR_NUM") {
+				selectedYear = [];
+			} else if (key == "FOOD_IND") {
+				selectedFoodInd = [];
+			} else if (key == "INOUT_IND") {
+				selectedInout = [];
+			} else if (key == "SKU_STATUS") {
+				selectedSKU = [];
+			} else if (key == "projoos") {
+				selectedProjOOS = [];
+			} else if (key == "Late") {
+				selectedLate = [];
+				// new changes to add the filters
+				// change this to match column name
+			} else if (key == "SUPL_SITE_NUM") {
+				selectedDC = [];
+			} else if (key == "BUYER_NUMBER") {
+				selectedBuyerNum = [];
+			} else if (key == "EXCEPTION_TYPE"){
+				selectedExceptionType = [];
+			} else if (key == "generic_ind") {
+				selectedGeneric = [];
+			} else if (key == "LOADING_GROUP") {
+				selectedLoading = [];
+			} else if (key == "COMPLIANCE_VEND_NUM") {
+				selectedCOMPLIANCE_BU_NUM = [];
+			} else if (key == "COMPLIANCE_VEND_NM") {
+				selectedCOMPLIANCE_BU_NAME = [];
+			} else if (key == "VEND_NUM") { // julia
+				selectedVEND_NUM = [];
+			} else if (key == "VEND_NM") { // julia
+				selectedVEND_NM = [];
+			} else if (key == "ORD_TY_CD") {
+				selectedORD_TY_CD = [];
+			} else if (key == "ETHNIC_ORIGIN_CD") {
+				selectedETHNIC_ORIGIN_CD = [];
+			} else if (key == "CAL_TYPE") {
+				selectedCalType = [];
+			} else if (key == "TRANSMODE") {
+				selectedTRANSMODE = [];
+			} else if (key == "CAL") {
+				selectedCAL = [];
+			} else if (key == "SOURCE") {
+				selectedSOURCE = [];
+			}
+			break;
+		}
+	}
+	applyFilters();
+}
+
+// This function populates the selected filters into the filter dropdowns
+// Used in the case where filters are carried over between pages
+function applyDefaultFilters() {
+	var outputString = document.getElementById("Output").value;
+	var parsedOutput = parseQuery(outputString);
+	// console.log(outputString);
+	for (key in parsedOutput) {
+		if (parsedOutput[key] != null && parsedOutput[key] != '' && key != 'DateStart' && key != 'DateEnd') {
+			var filter = '#' + key;
+			var select = parsedOutput[key];
+			var trimmed = select.replace("(", '');
+			var trimmed = trimmed.replace(")", '');
+			var trimmed = trimmed.replace(/[']+/g, '');
+			var trimmed = trimmed.split(', ');
+			$(filter).selectpicker('val', trimmed);
+			$(filter).attr("value", select);
+			$(filter).selectpicker('refresh');
+		}
+	}
+}
+
+// This function generates the getString WITHOUT the DateStart and DateEnd values. If needed they can be generated with:
+// var Dates = "&DateStart=" + document.getElementById("DateStart").value + "&DateEnd=" + document.getElementById("DateEnd").value;
+// This function is called in all pages
+function generateGetString() {
+
+	var outputString = '?';
+
+	var Late = encodeURIComponent($('#Late').attr("value"));
+	if (Late) {
+		outputString += "&Late=" + Late;
+	}
+
+	var SKU = encodeURIComponent($('#SKU_STATUS').attr("value"));
+	if (SKU) {
+		outputString += "&SKU_STATUS=" + SKU;
+	}
+
+	var projOOS = encodeURIComponent($('#projoos').attr("value"));
+	if (projOOS) {
+		outputString += "&projoos=" + projOOS;
+	}
+
+	var VP = encodeURIComponent($('#VP').attr("value"));
+	if (VP) {
+		outputString += "&VP=" + VP;
+	}
+
+	var Dir = encodeURIComponent($('#DIRECTOR').attr("value"));
+	if (Dir) {
+		outputString += "&DIRECTOR=" + Dir;
+	}
+
+	var SrMan = encodeURIComponent($('#SENIOR_MANAGER').attr("value"));
+	if (SrMan) {
+		outputString += "&SENIOR_MANAGER=" + SrMan;
+	}
+
+	if ($('#BUYER_NAME').attr("value")) {
+		var Buyer = encodeURIComponent($('#BUYER_NAME').attr("value"));
+		if (Buyer) {
+			outputString += "&BUYER_NAME=" + Buyer;
+		}
+	}
+
+	var BUYER_NUMBER = encodeURIComponent($('#BUYER_NUMBER').attr("value"));
+	if (BUYER_NUMBER) {
+		outputString += "&BUYER_NUMBER=" + BUYER_NUMBER;
+	}
+
+	var EXCEPTION_TYPE = encodeURIComponent($('#EXCEPTION_TYPE').attr("value"));
+	if (EXCEPTION_TYPE) {
+		outputString += "&EXCEPTION_TYPE=" + EXCEPTION_TYPE;
+	}
+
+	var SUPL_SITE_NUM = encodeURIComponent($('#SUPL_SITE_NUM').attr("value"));
+	if (SUPL_SITE_NUM) {
+		outputString += "&SUPL_SITE_NUM=" + SUPL_SITE_NUM;
+	}
+
+	var GENERIC_IND = encodeURIComponent($('#generic_ind').attr("value"));
+	if (GENERIC_IND) {
+		outputString += "&generic_ind=" + GENERIC_IND;
+	}
+
+	var MCH3 = encodeURIComponent($('#MCH_3_DESC_E').attr("value"));
+	if (MCH3) {
+		outputString += "&MCH_3_DESC_E=" + MCH3;
+	}
+
+	var MCH2 = encodeURIComponent($('#MCH_2_DESC_E').attr("value"));
+	if (MCH2) {
+		outputString += "&MCH_2_DESC_E=" + MCH2;
+	}
+
+	var MCH1 = encodeURIComponent($('#MCH_1_DESC_E').attr("value"));
+	if (MCH1) {
+		outputString += "&MCH_1_DESC_E=" + MCH1;
+	}
+
+	if ($('#MCH_0_DESC_E').attr("value")) {
+		var MCH0 = encodeURIComponent($('#MCH_0_DESC_E').attr("value"));
+		if (MCH0) {
+			outputString += "&MCH_0_DESC_E=" + MCH0;
+		}
+	}
+
+	var Active = encodeURIComponent($('#ACTIVE_IND').attr("value"));
+	if (Active) {
+		outputString += "&ACTIVE_IND=" + Active;
+	}
+
+	var Banner = encodeURIComponent($('#BANNER').attr("value"));
+	if (Banner) {
+		outputString += "&BANNER=" + Banner;
+	}
+
+	var Brand = encodeURIComponent($('#brand_type_code').attr("value"));
+	if (Brand) {
+		outputString += "&brand_type_code=" + Brand;
+	}
+
+	var Company = encodeURIComponent($('#COMPANY').attr("value"));
+	if (Company) {
+		outputString += "&COMPANY=" + Company;
+	}
+
+	var Ethnic = encodeURIComponent($('#ethnic_flag_desc_en').attr("value"));
+	if (Ethnic) {
+		outputString += "&ethnic_flag_desc_en=" + Ethnic;
+	}
+
+	var Division = encodeURIComponent($('#DIVISION').attr("value"));
+	if (Division) {
+		outputString += "&DIVISION=" + Division;
+	}
+
+	var Inout = encodeURIComponent($('#INOUT_IND').attr("value"));
+	if (Inout) {
+		outputString += "&INOUT_IND=" + Inout;
+	}
+
+	var FoodInd = encodeURIComponent($('#FOOD_IND').attr("value"));
+	if (FoodInd) {
+		outputString += "&FOOD_IND=" + FoodInd;
+	}
+
+	var GrpCode = encodeURIComponent($('#grp_code').attr("value"));
+	if (GrpCode) {
+		outputString += "&grp_code=" + GrpCode;
+	}
+
+	var LoadingGrp = encodeURIComponent($('#LOADING_GROUP').attr("value"));
+	if (LoadingGrp) {
+		outputString += "&LOADING_GROUP=" + LoadingGrp;
+	}
+
+	var Organic = encodeURIComponent($('#organic_ind').attr("value"));
+	if (Organic) {
+		outputString += "&organic_ind=" + Organic;
+	}
+
+	var Region = encodeURIComponent($('#REGION').attr("value"));
+	if (Region) {
+		outputString += "&REGION=" + Region;
+	}
+
+	var SCM = encodeURIComponent($('#SCM').attr("value"));
+	if (SCM) {
+		outputString += "&SCM=" + SCM;
+	}
+
+	var Store = encodeURIComponent($('#STORE').attr("value"));
+	if (Store) {
+		outputString += "&STORE=" + Store;
+	}
+
+	var COMPLIANCE_BU_NUM = encodeURIComponent($('#compliance_BU_num').attr("value"));
+	if (COMPLIANCE_BU_NUM) {
+		outputString += "&VEND_NUM=" + COMPLIANCE_BU_NUM;
+	}
+
+	var COMPLIANCE_BU_NAME = encodeURIComponent($('#compliance_BU_name').attr("value"));
+	if (COMPLIANCE_BU_NAME) {
+		outputString += "&VEND_NM=" + COMPLIANCE_BU_NAME;
+	}
+
+	var VEND_NUM = encodeURIComponent($('#vend_num').attr("value")); // julia
+	if (VEND_NUM) {
+		outputString += "&VEND_NUM=" + VEND_NUM;
+	}
+
+	// replaces needed to 'escape' the single quotes in some vendor names
+	var VEND_NM = encodeURIComponent($('#vend_nm').attr("value")).replace(/'/g, "''").replace("(''", "('").replace("'')", "')"); // julia
+	if (VEND_NM && pageID.split('_')[0] == 'inventory') {
+		outputString += "&VENDOR_NAME=" + VEND_NM;
+	}
+	else if (VEND_NM) {
+		outputString += "&VEND_NM=" + VEND_NM;
+	}
+
+	var ORD_TY_CD = encodeURIComponent($('#ORD_TY_CD').attr("value"));
+	if (ORD_TY_CD) {
+		outputString += "&ORD_TY_CD=" + ORD_TY_CD;
+	}
+
+	var ETHNIC_ORIGIN_CD = encodeURIComponent($('#ETHNIC_ORIGIN_CD').attr("value"));
+	if (ETHNIC_ORIGIN_CD) {
+		outputString += "&ETHNIC_ORIGIN_CD=" + ETHNIC_ORIGIN_CD;
+	}
+
+	var CalType = encodeURIComponent($('#CAL_TYPE').attr("value"));
+	if (CalType) {
+		outputString += "&CAL_TYPE=" + CalType;
+	}
+
+	if ($('#CORP_PD_NUM').attr("value")) {
+		var Period = encodeURIComponent($('#CORP_PD_NUM').attr("value"));
+		console.log(Period);
+		if (Period) {
+			outputString += "&CORP_PD_NUM=" + Period;
+		}
+	}
+
+	if ($('#CORP_YR_NUM').attr("value")) {
+		var Year = encodeURIComponent($('#CORP_YR_NUM').attr("value"));
+		console.log(Year);
+		if (Year) {
+			outputString += "&CORP_YR_NUM=" + Year;
+		}
+	}
+
+	if ($('#PROMO_YR_NUM').attr("value")) {
+		var PYear = encodeURIComponent($('#PROMO_YR_NUM').attr("value"));
+		console.log(PYear);
+		if (PYear) {
+			outputString += "&PROMO_YR_NUM=" + PYear;
+		}
+	}
+
+	if ($('#CORP_WK_NUM').attr("value")) {
+		var Week = encodeURIComponent($('#CORP_WK_NUM').attr("value"));
+		console.log(Week);
+		if (Week) {
+			outputString += "&CORP_WK_NUM=" + Week;
+		}
+	}
+
+	if ($('#PROMO_WK_NUM').attr("value")) {
+		var PWeek = encodeURIComponent($('#PROMO_WK_NUM').attr("value"));
+		if (PWeek) {
+			outputString += "&PROMO_WK_NUM=" + PWeek;
+		}
+	}
+
+	if ($('#TRANSMODE').attr("value")) {
+		var transmode = encodeURIComponent($('#TRANSMODE').attr("value"));
+		if (transmode) {
+			outputString += "&TRANSMODE=" + transmode;
+		}
+	}
+
+	if ($('#CAL').attr("value")) {
+		var cal = encodeURIComponent($('#CAL').attr("value"));
+		if (cal) {
+			outputString += "&CAL=" + cal;
+		}
+	}
+
+	var SOURCE = encodeURIComponent($('#SOURCE').attr("value"));
+	if (SOURCE) {
+		outputString += "&SOURCE=" + SOURCE;
+	}
+
+
+	//place regular metrics before this block
+	// if you need to add a metric to this block (for weekly metrics) then add an else if statement before the last else case or you'll break the other weekly metrics
+	if (pageID.split("_")[0] == 'promos') {
+		if ($('#PROMO_WK_NUM').attr("value") && $('#PROMO_YR_NUM').attr("value")) {
+			document.getElementById("Output").value = outputString
+		} else {
+			if (pageID.split("_").length == 3 && pageID.split("_")[2] == 'fpbpio') {
+				document.getElementById("Output").value = outputString + makePromos(new Date(), 2, pageID.split("_")[0]);
+			} else {
+				document.getElementById("Output").value = outputString + makePromos(new Date(), 1, pageID.split("_")[0]);
+			}
+		}
+	} else if (pageID.split("_")[0] == 'tenweekshorts') {
+		if ($('#CORP_WK_NUM').attr("value") && $('#CORP_WK_NUM').attr("value")) {
+			document.getElementById("Output").value = outputString
+		} else {
+			document.getElementById("Output").value = outputString + makePromos(new Date(), 0, pageID.split("_")[0]);
+		}
+	} 
+	
+	//else if (pageID.split("_")[0] == 'badsetting') {
+	//	if ($('#CORP_YR_NUM').attr("value") && $('#CORP_WK_NUM').attr("value")) {
+	//		document.getElementById("Output").value = outputString
+	//	} else {
+	//		document.getElementById("Output").value = outputString + makePromos(new Date(), 0, pageID.split("_")[0]);
+	//	}
+	//} 
+	
+	else if (['lineexceptions', 'lineexceptionssum'].includes(pageID.split("_")[0])) {
+		if ($('#CORP_YR_NUM').attr("value") || $('#CORP_PD_NUM').attr("value")) {
+			document.getElementById("Output").value = outputString
+		} else {
+			document.getElementById("Output").value = outputString + makePeriods(new Date(), pageID.split("_")[0]);
+		}
+	} else {
+		document.getElementById("Output").value = outputString;
+	}
+}
+
+// This function adds the DateStart and DateEnd filters to the getstring
+// This function is called in Graphs and Details pages
+function updateDates() {
+	if (document.getElementById("DateStart").value && document.getElementById("DateEnd").value) {
+		document.getElementById("Output").value += "&DateStart=" + document.getElementById("DateStart").value + "&DateEnd=" + document.getElementById("DateEnd").value;
+	} else {
+		// console.log("updateDates doesn't work because dates are not set");
+	}
+}
+
+// cutFilters(exclusion = Array of Str, Output = Str) => Produces Str
+// exclusion array should contain the filters you wish to get rid of from the Output string
+// Output should be a url string of filters
+// cutFilters function is used to get rid of certain filters defined in exclusion in the Output String and returns a resulting Output String without the filters
+function cutFilters(exclusions, Output) {
+	let value = Output.split('&');
+	let excluded = Output.split('&');
+	if (value[0] == "?" && excluded[0] == "?") {
+		value.shift();
+		excluded.shift();
+	}
+	for (let i = 0; i < value.length; i++) {
+		for (let x = 0; x < exclusions.length; x++) {
+				//console.log('i is ' + i + ' x is ' + x);
+				//console.log( value[i] + ' comparing ' + exclusions[x] + " is " + value[i].includes(exclusions[x]));
+			if (value[i].includes(exclusions[x])) {
+				for (let y = 0; y < excluded.length; y++) {
+					if (value[i] == excluded[y]) {
+						var index = y;
+					}
+				}
+				excluded.splice(index, 1);
+				//console.log(excluded);
+			}
+		}
+	};
+	var Output = excluded.join("&");
+	if (Output.charAt(0) != "?") {
+		Output = "?" + Output;
+	}
+	return Output
+}
+
+// This function updates all the links in the front and graphs pages
+// This function is called only on front page and graphs pages
+function updateLinks() {
+	var getData = document.getElementById("Output").value;
+	var today = "&DateStart=" + document.getElementById("DateStart").value + "&DateEnd=" + document.getElementById("DateEnd").value;
+	var yesterday = "&DateStart=" + document.getElementById("DateStartYes").value + "&DateEnd=" + document.getElementById("DateEndYes").value;
+	var wtd = "&DateStart=" + document.getElementById("DateStartWTD").value + "&DateEnd=" + document.getElementById("DateEndWTD").value;
+	var yoy = "&DateStart=" + document.getElementById("DateStartYOY").value + "&DateEnd=" + document.getElementById("DateEndYOY").value;
+	var ytlw = "&DateStart=" + document.getElementById("DateStartYTLW").value + "&DateEnd=" + document.getElementById("DateEndYTLW").value;
+	var lstsun = "&DateStart=" + document.getElementById("DateStartLstSun").value + "&DateEnd=" + document.getElementById("DateEndLstSun").value;
+	//if the default date is supposed to be today, add today to the front page link. Vice versa for yesterday.
+	if (pageID.split("_")[0] == "frontpage") {
+		document.getElementById("sl_link").href = "./servicelevel/index.php" + getData + yesterday;
+		document.getElementById("inv_link").href = "./inventory/index.php" + getData + today;
+		document.getElementById("ff_link").href = "./firmflags/index.php" + getData + yesterday;
+		document.getElementById("sd_link").href = "./staledate/index.php" + getData + yesterday;
+		document.getElementById("avail_link").href = "./availability/index.php" + getData + today;
+
+		document.getElementById("exceptions_link").href = "./exceptions/index.php" + getData + today;
+		document.getElementById("ipfr_link").href = "./ipfrusage/index.php" + getData + ytlw;
+		document.getElementById("dno_link").href = "./dno/index.php" + getData + today;
+		document.getElementById("dsisum_link").href = "./dsisum/index.php" + getData + today;
+		document.getElementById("near_expiry_skus_link").href = "./nearexpiryskus/index.php" + getData + today;
+		let promo = cutFilters(['DateStart', 'DateEnd'], getData);
+		let wb = cutFilters(['VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME', 'BUYER_NUMBER', 'MCH_3_DESC_E', 'MCH_2_DESC_E', 'MCH_1_DESC_E', 'MCH_0_DESC_E', 'brand_type_code', 'COMPANY', 'ethnic_flag_desc_en', 'organic_ind', 'REGION'], getData);
+		let fl = cutFilters(['VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME', 'BUYER_NUMBER'], getData);
+		let wf = cutFilters(['MCH_3_DESC_E', 'MCH_2_DESC_E', 'MCH_1_DESC_E', 'MCH_0_DESC_E', 'brand_type_code', 'COMPANY', 'ethnic_flag_desc_en', 'organic_ind', 'REGION', 'CORP_WK_NUM_tab', 'CORP_YR_NUM_tab', 'CORP_WK_NUM', 'CORP_YR_NUM'], getData);
+		let lde = cutFilters(['VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME', 'BUYER_NUMBER', 'brand_type_code', 'COMPANY', 'ethnic_flag_desc_en', 'organic_ind'], getData);
+		document.getElementById("promos_link").href = "/promos/index.php" + promo;
+		document.getElementById("poconfirmation_link").href = "/poconfirmation/index.php" + getData + today;
+		document.getElementById("schedrcpts_link").href = "/schedrcpts/index.php" + getData + today;
+		document.getElementById("inout_link").href = "/inboundoutbound/index.php" + getData + today;
+		document.getElementById("workbenchlink").href = "/workbenchtool/index.php" + wb + today;
+		document.getElementById("buyerworkflow_link").href = "/buyerworkflow/index.php" + wf + today;
+		document.getElementById("seasonalcleaningprocesslink").href = "/seasonalcleaningprocess/index.php" + wb + today;
+		//document.getElementById("LRRStockExceptions_link").href = "/LRRStockExceptions/index.php" + getData + today;
+		document.getElementById("tenweekshorts_link").href = "/tenweekshorts/index.php" + promo;
+		//document.getElementById("badsetting_link").href = "/badsetting/index.php" + promo;
+		document.getElementById("badsetting_link").href = "/badsetting/index.php" + getData + today;
+		document.getElementById("ldeforecasterror_link").href = "/ldeforecasterror/index.php" + lde + lstsun;
+		document.getElementById("dsdfillrate_link").href = "/dsdfillrate/index.php" + fl + lstsun;
+
+
+	} else if (pageID.split("_")[0] == 'ipfrusage') {
+		document.getElementById("ipfrtot_link").href = "/ipfrusage/details/usage/index.php" + getData;
+		document.getElementById("buyerusage_link").href = "/ipfrusage/details/podetails/index.php" + getData;
+
+
+	} else if (pageID.split("_")[0] == 'compliance') {
+		document.getElementById("lineexceptions_link").href = "/lineexceptions/index.php?" + makePeriods(new Date(), 'lineexceptions');
+		document.getElementById("lineexceptionssum_link").href = "/lineexceptionssum/index.php?" + makePeriods(new Date(), 'lineexceptions');
+	}
+	else if (pageID.split("_")[0] == 'staledate') {
+		document.getElementById("rept_link").href = "/staledate/details/article/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'buyerworkflow') {
+		document.getElementById("rept_link").href = "/buyerworkflow/details/Sourcing_Exceptions/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'uom') {
+		document.getElementById("uom_link").href = "/uom/details/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'nearexpiryskus') {
+		document.getElementById("artlink").href = "/nearexpiryskus/details/article/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'exceptions') {
+		let mssFilters = cutFilters(['VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME'], getData);
+		let mSUPL_SITE_NUMters = cutFilters(['BANNER', 'STORE'], getData);
+		let oreFilters = cutFilters(['MCH_3_DESC_E', 'MCH_2_DESC_E', 'MCH_1_DESC_E', 'MCH_0_DESC_E', 'ethnic_flag_desc_en', 'organic_ind', 'brand_type_code', 'BANNER', 'STORE'], getData);
+		let rSUPL_SITE_NUMters = cutFilters(['BANNER', 'STORE'], getData);
+		let skuFilters = cutFilters(['BANNER', 'STORE'], getData);
+
+		document.getElementById("mss_link").href = "/missingstoresourcing/index.php" + mssFilters;
+		document.getElementById("mdc_link").href = "/missingdcsourcing/index.php" + mSUPL_SITE_NUMters;
+		document.getElementById("oe_link").href = "/orderexception/index.php" + oreFilters;
+		document.getElementById("rd_link").href = "/receivingdiscrepancies/index.php" + rSUPL_SITE_NUMters;
+		document.getElementById("se_link").href = "/skuexception/index.php" + skuFilters;
+	}
+	else if (pageID.split("_")[0] == 'servicelevel') {
+		document.getElementById("article_link").href = "/servicelevel/details/article/index.php" + getData;
+		document.getElementById("region_link").href = "/servicelevel/details/region/index.php" + getData;
+		document.getElementById("mch_link").href = "/servicelevel/details/mch/index.php" + getData;
+		document.getElementById("vendor_link").href = "/servicelevel/details/vendor/index.php" + getData;
+		document.getElementById("ec_link").href = "/servicelevel/details/ec/index.php" + getData;
+		document.getElementById("t3_link").href = "/servicelevel/details/t3/index.php" + getData;
+		document.getElementById("buyer_link").href = "/servicelevel/details/buyer/index.php" + getData;
+		document.getElementById("brand_link").href = "/servicelevel/details/brand/index.php" + getData;
+		document.getElementById("buyerdca_link").href = "/servicelevel/details/buyerdca/index.php" + getData;
+		document.getElementById("mch0_link").href = "/servicelevel/details/mch0/index.php" + getData;
+		document.getElementById("articleonly_link").href = "/servicelevel/details/articleonly/index.php" + getData;
+		// default date range requested for these pages is predefined 
+		let dateless = cutFilters(['DateStart', 'DateEnd'], getData);
+		document.getElementById("mchdca_link").href = "/servicelevel/details/mchdca/index.php" + dateless + wtd;
+		document.getElementById("mchdcd_link").href = "/servicelevel/details/mchdcd/index.php" + dateless + wtd;
+	}
+	else if (pageID.split("_")[0] == 'dsdfillrate') {
+		document.getElementById("article_link").href = "/dsdfillrate/details/article/index.php" + getData;
+		document.getElementById("articleonly_link").href = "/dsdfillrate/details/articleonly/index.php" + getData;
+		document.getElementById("mch_link").href = "/dsdfillrate/details/mch/index.php" + getData;
+		document.getElementById("vendor_link").href = "/dsdfillrate/details/vendor/index.php" + getData;
+		document.getElementById("brand_link").href = "/dsdfillrate/details/brand/index.php" + getData;
+		document.getElementById("banner_link").href = "/dsdfillrate/details/banner/index.php" + getData;
+
+
+	}
+	else if (pageID.split("_")[0] == 'dsisum') {
+		document.getElementById("dsisummarylink").href = "/dsisum/details/dsisummary/index.php" + getData;
+		document.getElementById("dsisummarybulink").href = "/dsisum/details/dsisummarybu/index.php" + getData;
+		document.getElementById("codedateexeclink").href = "/dsisum/details/codedateexec/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'availability') {
+		document.getElementById("banner_link").href = "/availability/details/banner/index.php" + getData;
+		let avail = cutFilters(['DIVISION', 'STORE'], getData);
+		document.getElementById("mch_link").href = "/availability/details/mch/index.php" + avail;
+		document.getElementById("vendor_link").href = "/availability/details/vendor/index.php" + avail;
+		document.getElementById("region_link").href = "/availability/details/region/index.php" + avail;
+		document.getElementById("buyer_link").href = "/availability/details/buyer/index.php" + avail;
+		document.getElementById("brand_link").href = "/availability/details/brand/index.php" + avail;
+		document.getElementById("article_link").href = "/availability/details/article/index.php" + avail;
+	}
+	else if (pageID.split("_")[0] == 'firmflags') {
+		document.getElementById("vendor_link").href = "/firmflags/details/vendor/index.php" + getData;
+		document.getElementById("mch_link").href = "/firmflags/details/mch/index.php" + getData;
+		document.getElementById("shorts_link").href = "/firmflags/details/shorts/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'orderexception') {
+		document.getElementById("vendor_link").href = "/orderexception/details/vendor/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'skuexception') {
+		document.getElementById("vendor_link").href = "/skuexception/details/vendor/index.php" + getData;
+		document.getElementById("mch_link").href = "/skuexception/details/mch/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'missingdcsourcing') {
+		document.getElementById("artdc_link").href = "/missingdcsourcing/details/articledc/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'missingstoresourcing') {
+		document.getElementById("link_banner").href = "/missingstoresourcing/details/banner/index.php" + getData;
+		document.getElementById("link_mch").href = "/missingstoresourcing/details/mch/index.php" + getData;
+		document.getElementById("link_store").href = "/missingstoresourcing/details/articlestore/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'dno') {
+		document.getElementById("dno_link").href = "/dno/details/sku/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'inventory') {
+		document.getElementById("rept_link").href = "/inventory/details/article/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'dde') {
+		document.getElementById("dde_link").href = "/dde/details/dde/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'promos') {
+		document.getElementById("date_link").href = "/promos/details/date/index.php" + getData;
+		document.getElementById("banner_link").href = "/promos/details/banner/index.php" + getData;
+		// console.log(getData);
+		if (decodeURI(getData).includes(makePromos(new Date(), 1, pageID.split("_")[0]))) {
+			document.getElementById("fpbpio_link").href = "/promos/details/fpbpio/index.php" + cutFilters(['PROMO_WK_NUM', 'PROMO_YR_NUM'], getData) + makePromos(new Date(), 2, pageID.split("_")[0]);
+		} else {
+			document.getElementById("fpbpio_link").href = "/promos/details/fpbpio/index.php" + getData
+		}
+	}
+	else if (pageID.split("_")[0] == 'poconfirmation') {
+		document.getElementById("podetails_link").href = "/poconfirmation/details/podetails/index.php" + getData;
+		document.getElementById("vendorsummary_link").href = "/poconfirmation/details/vendorsummary/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'schedrcpts') {
+		document.getElementById("po_link").href = "/schedrcpts/details/po/index.php" + getData;
+	} 
+	else if (pageID.split("_")[0] == 'inboundoutbound') {
+		let inbound = cutFilters(['DateStart', 'DateEnd'], getData);
+		document.getElementById("in_link").href = "/inboundoutbound/details/inbound/index.php" + inbound;
+		document.getElementById("in_link_2").href = "/inboundoutbound/details/inbound2/index.php" + inbound;
+		document.getElementById("in_link_3").href = "/inboundoutbound/details/inboundvend/index.php" + inbound;
+		document.getElementById("out_link").href = "/inboundoutbound/details/outbound/index.php" + inbound;
+		document.getElementById("out_link_2").href = "/inboundoutbound/details/outbound2/index.php" + inbound;
+		document.getElementById("pallet_link").href = "/inboundoutbound/details/pallets/index.php" + inbound;
+		document.getElementById("pallet_link_2").href = "/inboundoutbound/details/pallets2/index.php" + inbound;
+		
+		let est = cutFilters(['DateStart', 'DateEnd', 'VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME', 'MCH_3_DESC_E', 'MCH_2_DESC_E', 'MCH_1_DESC_E', 'MCH_0_DESC_E', 'brand_type_code', 'COMPANY', 'ethnic_flag_desc_en', 'organic_ind', 'REGION'], getData);
+
+		document.getElementById("est_link").href = "/inboundoutbound/details/palletest/index.php" + est;
+		document.getElementById("est_link_2").href = "/inboundoutbound/details/palletest2/index.php" + est;
+	} 
+	else if (pageID.split("_")[0] == 'complianceinput') {
+		document.getElementById("dcsaplive_link").href = "/dcsaplive/index.php";
+	} 
+	else if (pageID.split("_")[0] == 'tenweekshorts') {
+		document.getElementById("link_dc").href = "/tenweekshorts/details/dc/index.php" + getData;
+		document.getElementById("link_vend").href = "/tenweekshorts/details/vend/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'badsetting') {
+		//let mcdFilters = cutFilters(['VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME', 'BUYER_NUMBER'], getData);
+
+		document.getElementById("dsi_link").href = "/badsetting/details/dsi/index.php" + getData;
+		document.getElementById("dsiinterbranch_link").href = "/badsetting/details/dsiinterbranch/index.php" + getData;
+		document.getElementById("safetystock_link").href = "/badsetting/details/safetystock/index.php" + getData;
+		document.getElementById("supplysource_link").href = "/badsetting/details/supplysource/index.php" + getData;
+		document.getElementById("loadtime_link").href = "/badsetting/details/loadtime/index.php" + getData;
+		document.getElementById("uomissues_link").href = "/badsetting/details/uomissues/index.php" + getData;
+		document.getElementById("circularsourcing_link").href = "/badsetting/details/circularsourcing/index.php" + getData;
+		document.getElementById("flowskumoq_link").href = "/badsetting/details/flowskumoq/index.php" + getData;
+		document.getElementById("planningexceptions_link").href = "/badsetting/details/planningexceptions/index.php" + getData;
+		document.getElementById("autoapproveissues_link").href = "/badsetting/details/autoapproveissues/index.php" + getData;
+		document.getElementById("mcdexceptions_link").href = "/badsetting/details/mcdexceptions/index.php" + getData;
+		document.getElementById("e4400_link").href = "/badsetting/details/e4400/index.php" + getData;
+	}
+	else if (pageID.split("_")[0] == 'ldeforecasterror') {
+		//let mcdFilters = cutFilters(['VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME', 'BUYER_NUMBER'], getData);
+		document.getElementById("mch1levelnoextn_link").href = "/ldeforecasterror/details/mch1levelnoextn/index.php" + getData;
+		document.getElementById("mch0levelnoextn_link").href = "/ldeforecasterror/details/mch0levelnoextn/index.php" + getData;
+		document.getElementById("itemlevelnoextn_link").href = "/ldeforecasterror/details/itemlevelnoextn/index.php" + getData;
+	}
+
+}
+
+// cookies fns
+function makeCookie(name = 'Output', days = 7) {
+	var date = new Date();
+	date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+	var expires = "; expires=" + date.toUTCString();
+
+	var value = document.getElementById("Output").value.split('&');
+	if (value[0] == "?") {
+		value.shift();
+	}
+	var defaultFilterList = ['VP', 'DIRECTOR', 'SENIOR_MANAGER', 'BUYER_NAME', 'MCH_3_DESC_E', 'MCH_2_DESC_E',
+		'MCH_1_DESC_E', 'MCH_0_DESC_E', 'brand_type_code', 'COMPANY', 'ethnic_flag_desc_en',
+		'organic_ind', 'REGION'];
+	var newOutput = [];
+	for (i = 0; i < value.length; i++) {
+		for (x = 0; x < defaultFilterList.length; x++) {
+			if (value[i].indexOf(defaultFilterList[x]) !== -1) {
+				newOutput.push(value[i]);
+			}
+		}
+	};
+	var Output = "?" + newOutput.join("&");
+	document.cookie = name + "=" + Output + expires + "; path=/";
+}
+
+function deleteCookie(name = 'Output') {
+	makeCookie(name, "", -1);
+}
+
+// returns the value of the first cookie. There should always only be 1 cookie unless we added some more then you should remake this function
+function readCookie(name = 'Output') {
+	splitCookie = document.cookie.split(";");
+	for (var i = 0; i < splitCookie.length; i++) {
+		if (i > 0) {
+			key = " " + name + "="
+		} else {
+			key = name + "="
+		}
+		if (splitCookie[i].includes(key)) {
+			return splitCookie[i].substr(key.length, splitCookie[i].length);
+		}
+	}
+}
+
+function downloadLink() {
+	currentPage = location.href.split("/").pop(); // get just the filename. e.g. "example.php"
+	arrPage = currentPage.split("."); // convert the filename in to an array consisting of the name and ext. e.g. "example" and "php"
+	downloadLink = arrPage[0] + "_download.php"; // build the name of the download link e.g. "example_download.php"
+	link = downloadLink + document.getElementById("Output").value; // add the filter criteria from output
+	window.location = link; // loads the new page, which is just a file, so it doesn't actually navigate away from this page
+}
+
+
+// updateBackButton trims all invalid filters off of the output url string and redirects the user back the the higher level page they came from with all applicable filters
+// only add to this function if your page has an additional filter that won't work on the front page like division or group code
+function updateBackButton() {
+	var PageID = document.getElementById('pageID').value;
+	var getData = document.getElementById("Output").value;
+
+	if (PageID.split('_').length == 3) {
+		//console.log("/" + PageID.split('_')[0] + "/index.php" + getData); {
+		if (PageID.split('_')[2] == 'fpbpio') {
+			var data = cutFilters(['projoos', 'Late', 'SKU_STATUS', 'SORT', 'DIRECTION'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data
+		} else if (PageID.split('_')[0] == 'inventory') {
+			var data = cutFilters(['LOADING_GROUP', 'COUNT', 'SORT', 'DIRECTION'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data
+		} else if (PageID.split('_')[0] == 'missingstoresourcing' && PageID.split('_')[2] == 'articlestore') {
+			var data = cutFilters(['COUNT', 'SORT', 'DIRECTION'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data
+		} else if (PageID.split('_')[2] == 'article') {
+			var data = cutFilters(['COUNT', 'SORT', 'DIRECTION'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data
+		} else if (PageID.split('_')[2] == 't3') {
+			var data = cutFilters(['SORT', 'DIRECTION'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data
+		} else if (PageID.split('_')[2] == 'po') {
+			var data = cutFilters(['SORT', 'DIRECTION', 'COUNT', 'late', 'open', 'artcl_num', 'supl_site_num'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data
+		} else if (PageID.split('_')[0] == 'buyerworkflow') {
+			var data = cutFilters(['SORT', 'DIRECTION'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data			
+		} else if (PageID.split('_')[0] == 'uom') {
+			var data = cutFilters(['SORT', 'DIRECTION'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data			
+		} else if (PageID.split('_')[0] == 'calendars' && PageID.split('_')[2] == 'visual') {
+			document.getElementById('back-button').onclick = location.href = "/index.php"
+		} else if (PageID.split('_')[0] == 'calendars') {
+			document.getElementById('back-button').onclick = location.href = "/calendars/index.php"
+		} else {
+			var data = cutFilters(['SORT', 'DIRECTION', 'COUNT'], getData);
+			document.getElementById('back-button').onclick = location.href = "/" + PageID.split('_')[0] + "/index.php" + data;
+		}
+	} else if (PageID.split('_').length == 2) {
+		if (PageID.split('_')[0] == 'availability') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'DIVISION', 'BANNER', 'STORE'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'firmflags') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'grp_code'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'servicelevel') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'BANNER', 'SKU_STATUS', 'INOUT_IND', 'generic_ind', 'ORD_TY_CD'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'dsdfillrate') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'CORP_YR_NUM', 'CORP_WK_NUM','COMPLIANCE_VEND_NUM'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'staledate') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'BANNER'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'dno') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'INOUT_IND', 'FOOD_IND'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'promos') {
+			var data = cutFilters(['PROMO_WK_NUM', 'PROMO_YR_NUM', 'BANNER'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (['missingstoresourcing', 'missingdcsourcing', 'orderexception', 'receivingdiscrepancies', 'skuexception'].includes(PageID.split('_')[0])) {
+			var data = cutFilters(['BANNER', 'STORE'], getData);
+			document.getElementById('back-button').onclick = location.href = "/exceptions/index.php" + data
+		} else if (PageID.split('_')[0] == 'inboundoutbound') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'SUPL_SITE_NUM'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'dcsaplive') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'SUPL_SITE_NUM'], getData);
+			document.getElementById('back-button').onclick = location.href = "/complianceinput/index.php" + data
+		} else if (['frexempindpd', 'frexemptdept', 'frexemptmch0', 'mch0toscmmapping', 'vendorwatchlist', 'fillrateexceptions'].includes(PageID.split('_')[0])) {
+			var data = cutFilters(['DateEnd', 'DateStart'], getData);
+			document.getElementById('back-button').onclick = location.href = "/complianceinput/index.php" + data
+		} else if (['fourweeksl', 'vendorpenaltysum', 'lineexceptions', 'lineexceptionssum'].includes(PageID.split('_')[0])) {
+			var data = cutFilters(['DateEnd', 'DateStart'], getData);
+			document.getElementById('back-button').onclick = location.href = "/compliance/index.php"
+		} else if (PageID.split('_')[0] == 'tenweekshorts') {
+			var data = cutFilters(['CORP_WK_NUM', 'CORP_YR_NUM', 'CORP_PD_NUM', 'CORP_QTR_NUM', 'BANNER', 'generic_ind', 'SUPL_SITE_NUM'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'badsetting') {
+			var data = cutFilters(['CORP_YR_NUM', 'CORP_QTR_NUM', 'CORP_PD_NUM', 'CORP_WK_NUM'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'calendars') {
+			document.getElementById('back-button').onclick = location.href = "/index.php"
+		} else if (PageID.split('_')[0] == 'ldeforecasterror') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'BANNER'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else if (PageID.split('_')[0] == 'buyerworkflow') {
+			var data = cutFilters(['DateEnd', 'DateStart', 'EXCEPTION_TYPE'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		} else {
+			var data = cutFilters(['DateEnd', 'DateStart'], getData);
+			document.getElementById('back-button').onclick = location.href = "/index.php" + data
+		}
+	}
+}
+
+//helper function for updateCSVdl(). hardcodes the link to the csv generating file with current filters
+function new_dl() {
+	var getData = document.getElementById("Output").value;
+	window.location = 'index_download.php' + getData
+}
+
+// changes the download button onclick function to a function that is actually defined after filters are set. 
+// IDK why the original function, downloadLink(), stops getting defined after filters are applied as it was being defined everywhere. probably something to do with the order of the code being run after ajax/jquery stuff gets run
+//its not a bug, its a feature
+function updateCSVdl() {
+	document.getElementById('download_button').setAttribute('onclick', 'new_dl()');
+}
+
+// function to get the week_num from a Date. Used for Promos
+function ISO8601_week_no(dt) {
+	var tdt = new Date(dt.valueOf());
+	var dayn = (dt.getDay() + 6) % 7;
+	tdt.setDate(tdt.getDate() - dayn + 3);
+	var firstThursday = tdt.valueOf();
+	tdt.setMonth(0, 1);
+	if (tdt.getDay() !== 4) {
+		tdt.setMonth(0, 1 + ((4 - tdt.getDay()) + 7) % 7);
+	}
+	return 1 + Math.ceil((firstThursday - tdt) / 604800000);
+}
+
+// function to create the querystring for the promo_wk and promo_yr filters for Promos and corp versions for tenweeksshorts
+function makePromos(dt, week, page) {
+	if (dt.getDay() == 0) { // getting the wk num
+		var wk_num = ISO8601_week_no(dt) + week + 1;
+	} else {
+		var wk_num = ISO8601_week_no(dt) + week;
+	}
+
+	if (wk_num > 52) { //getting the yr num
+		var yr_num = dt.getFullYear() + 1
+		var wk_num = 1;
+	} else {
+		var yr_num = dt.getFullYear()
+	}
+
+	//printing the string
+	console.log(page);
+	if (page == 'promos') {
+		var promostr = "&PROMO_WK_NUM=('" + wk_num + "')&PROMO_YR_NUM=('" + yr_num + "')";
+	} else {
+		var promostr = "&CORP_WK_NUM=('" + wk_num + "')&CORP_YR_NUM=('" + yr_num + "')";
+	}
+	return promostr
+}
+
+//function to make period/year filters for metrics
+function makePeriods(dt, page) {
+	var wk_num = ISO8601_week_no(dt);
+	if (wk_num > 52) { //getting the yr num
+		var yr_num = dt.getFullYear() + 1
+		var wk_num = 1;
+	} else {
+		var yr_num = dt.getFullYear();
+	}
+
+	if (wk_num % 4 === 0) {
+		last_pd = (Math.floor((wk_num)/4)) - 1;
+	} else {
+		last_pd = (Math.floor((wk_num)/4));
+	}
+
+
+	if (page == 'lineexceptions') {
+		var promostr = "&CORP_PD_NUM=('" + last_pd + "')&CORP_YR_NUM=('" + yr_num + "')";
+	} else {
+		var promostr = "&CORP_PD_NUM=('" + last_pd + "')&CORP_YR_NUM=('" + yr_num + "')";
+	}
+	return promostr
+}

@@ -1,0 +1,407 @@
+var pageID = document.getElementById('pageID').value;
+var dateLabel;
+var favData;
+var pagename;
+const tooltips = document.querySelectorAll('.tt')
+setPageName();
+checkPageExport();
+checkSlider();
+
+tooltips.forEach(t => {
+    new bootstrap.Tooltip(t)
+})
+
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+       // Typical action to be performed when the document is ready:
+        favData = JSON.parse(xhttp.responseText);   
+        generateFavorites();
+    }
+};
+xhttp.open("GET", "/jsons/favourites.json", true);
+xhttp.send();
+
+function setPageName() { 
+    var page = document.getElementById("page");
+    pagename = pageID.split("_")[0];
+
+    // add new pages as necessary
+    const newname = function(pagename) {return {
+        'frontpage': 'Overview',
+        'servicelevel': 'Service Level',
+        'firmflags': 'Firm Flags',
+        'ipfrusage': 'IPFR Usage',
+        'projectedshorts': 'Projected Shorts',
+        'inboundoutbound': 'DC Inbound Outbound',
+        'dno': "DNO'd SKUs with Inventory",
+        'dsisum': 'DSI Summary and Code Date',
+        'nearexpiryskus': 'Near Expiry SKUs',
+        'schedrcpts': "Scheduled Receipts and Late PO's",
+        'badsetting': 'Bad Setting',
+        'calendar': 'Calendar Visualization',
+        'buyerworkflow': 'Exception Workflow Management',
+        'fillrate': 'Fill Rate',
+        'LDEForecastError': 'LDE Forecast Error',
+        'LRRStockExceptions': 'LRR Stock Exceptions',
+        'POConfirmation': 'PO Confirmation',
+        'tenweekshorts': 'Ten Week Shorts',
+        'workbenchtool': 'Workbench Tool',
+        'seasonalcleaningprocess': 'Seasonal Cleaning Tool',
+        'lineexceptions': 'Line Item Exceptions',
+        'complianceinput': 'Compliance Input',
+        'dcsaplive': 'DC SAP Live',
+        'dde': 'DDE',
+        'exec': 'Executive Summary',
+        'fillrateexemptions': 'Fill Rate Exemptions',
+        'fourweeksl': 'Items Four Week SL < 93%',
+        'freshinv': 'Fresh Inventory',
+        'frexempindpd': 'FR EXEMP IND PD',
+        'frexemptdept': 'FR EXEMPT DEPT',
+        'frexemptmch0': 'FR EXEMPT MCH0',
+        'lineexceptionssum': 'Line Exceptions Sum',
+        'mch0toscmmapping': 'MCH0 to SCM Mapping',
+        'missingdcsourcing': 'Missing DC Sourcing',
+        'missingstoresourcing': 'Missing Store Sourcing',
+        'orderexception': 'Order Exception',
+        'receivingdiscrepancies': 'Receiving Discrepancies',
+        'security': 'Security',
+        'sftool': 'Safety Stock Tool',
+        'skuexception': 'SKU Exception',
+        'uom': 'UOM',
+        'vendorpenaltysum': 'Vendor Penalty Sum',
+        'vendorwatchlist': 'Vendor Watchlist',
+        'webstats': 'Web Stats',
+        'dsdfillrate': 'DSD Fill Rate'
+    }[pagename];
+    }
+
+    pagename = newname(pagename) || pagename.charAt(0).toUpperCase() + pagename.substr(1);
+    page.innerHTML = pagename;
+    document.title = pagename;
+}
+
+function reload() {
+    location.reload();
+}
+
+function toggleStar() {
+    var star = document.getElementById("star");
+    var tooltip = document.getElementById("favToolTip");
+
+    if (star.classList.contains("bi-star-fill")) {
+        star.classList.remove("bi-star-fill");
+        star.classList.add("bi-star");
+        star.innerHTML='<path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>';
+        tooltip.setAttribute("data-original-title", "Add to Favourites");
+        tooltip.title = "Add to Favourites";
+    }
+    else if (star.classList.contains("bi-star")) {
+
+        star.classList.remove("bi-star");
+        star.classList.add("bi-star-fill");
+        star.innerHTML='<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>';
+        tooltip.setAttribute("data-original-title", "Remove from Favourites");
+        tooltip.title = "Remove from Favourites";
+        
+        // console.log(document.getElementById("Output").value);
+        // console.log(document.getElementById("ranges"));
+
+        var newurl = location.href.split("?")[0];
+        var filters = document.getElementById("Output").value.split("&");
+        var daterange = null;
+        for (let i = 0; i < filters.length; i++) {
+            if (filters[i].startsWith("Date") || filters[i].startsWith("PROMO") || filters[i].startsWith("CORP")) {
+                filters.splice(i, 1); // clears the date part of the url
+                i = i-1;
+                daterange = dateLabel || "Today"; // means there is a date
+            }
+        }
+        // if has these, get datelabel
+
+        newurl += filters.join("&");
+
+        console.log("user: " + username + " url: " + newurl + " label: " + daterange);
+
+        writeToJSON(username, pagename, newurl, daterange);
+
+        fav = JSON.stringify(favData);
+        $.ajax({
+            type: "POST",
+            url: "/headers/write_favourites.php",
+            data: {'fav': fav},
+            dataType: 'text',
+            success: function() {
+                console.log("success?");
+                generateFavorites();
+            }
+         });
+    }
+}
+
+// name is misleading
+function writeToJSON(user, title, url, daterange) {
+
+    // if the user is not in the favourites json, adds them
+    if (!favData.some((person) => person.user == username)) {
+        console.log("new user");
+        temp = {'user' : username, 'favourites' : []};
+        favData.push(temp);
+    }
+
+    // pushes link to favourites array under user
+    for (i = 0; i < favData.length; i++) {
+        if (favData[i].user == user) {
+
+            temp = {'title': title, 'url' : url, 'date': daterange};
+            favData[i].favourites.push(temp);
+            // for (j = 0; j < favData[i].favourites.length; j++) {
+            //     i
+            // }
+
+        }
+    }
+}
+
+function checkStar() {
+    // function to check if page has been previously favourited
+}
+
+function checkPageExport() {
+    var pagedetails = pageID.split("_")[1];
+    var exportlist = ["details"]; // put pages in here // if they're all detail then edit the code
+
+    if (exportlist.includes(pagedetails)) {
+        document.getElementById("export").style.display = "block";
+    }
+    else {
+        document.getElementById("export").style.display = "none";
+    }
+}
+
+function checkSlider () {
+    var page = pageID.split("_")[0];
+    var level = pageID.split("_")[1];
+    if (page == "servicelevel" && level == 'graphs') {
+        document.getElementById("rangeLabel").style.display = "block";
+        document.getElementById("graphDate").style.display = "block";
+    }
+    else {
+        document.getElementById("rangeLabel").style.display = "none";
+        document.getElementById("graphDate").style.display = "none";
+    }
+}
+
+function downloadLink() {
+    currentPage = location.href.split("/").pop(); // get just the filename. e.g. "example.php"
+    console.log(currentPage);
+    arrPage = currentPage.split("."); // convert the filename in to an array consisting of the name and ext. e.g. "example" and "php"
+    console.log(arrPage);
+    downloadLink = arrPage[0] + "_download." + arrPage[1]; // build the name of the download link e.g. "example_download.php"
+    console.log(downloadLink);
+    link = downloadLink + document.getElementById("Output").value; // add the filter criteria from output
+    console.log(link);
+    window.location = link; // loads the new page, which is just a file, so it doesn't actually navigate away from this page
+}	
+
+function showTooltip(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+function hideTooltip(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+// set in DateFilter.js when date is updated
+function setDateLabel(label) {
+    dateLabel = label;
+}
+
+function generateFavorites() {
+    // based on user, access json and see favourites
+
+    $("#favouritesDropdown").empty();
+
+    for (i = 0; i < favData.length; i++) {
+        if (favData[i].user == username) {
+            var dropdown = document.getElementById("favouritesDropdown");
+            for (j = 0; j < favData[i].favourites.length; j++) {
+                dropdown.innerHTML += 
+                
+                //`<a class="dropdown-item" onclick="loadDate('` + favData[i].favourites[j].url + `', '` + favData[i].favourites[j].date + `');">` + favData[i].favourites[j].title + `</a>`;
+                
+
+                // '<a class="dropdown-item" onclick="loadDate("' + url + '", "' + date + '");">' + title + '</a>';
+
+
+                `
+                    <div class="dropdown-item d-flex align-items-center justify-content-between align-self-center" onmouseover="makeVisible(this);" onmouseout="makeInvisible(this);">
+                        <a class="link-dark" href="` + favData[i].favourites[j].url + `">` + favData[i].favourites[j].title + `</a>
+                        <form style="display: none;" onsubmit="changeTitle(this, ` + i + `, ` + j + `);return false">
+                            <input class="form-control form-control-sm" placeholder="` + favData[i].favourites[j].title + `" onsubmit="changeTitle(this)"></input>
+                            <input type="submit" style="display: none;"/>
+                        </form>
+                        <div class="ml-5" style="visibility: hidden;">
+                            <svg type="button" onclick="dropClick(1, this, ` + i + `, ` + j + `)" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-pencil-square mr-1" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                            <svg type="button" onclick="dropClick(2, this, ` + i + `, ` + j + `)" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                        </div>
+                    </div>`;
+
+                // '<a class="dropdown-item" href="' + favData[i].favourites[j].url + '">' + favData[i].favourites[j].url + '</a>';
+            }
+        }
+    }
+}
+
+function changeTitle(item, i, j) {
+    
+    // setting new favourite title in dropdown
+    item.previousSibling.previousSibling.style.display = "block";
+    item.previousSibling.previousSibling.innerHTML = item.childNodes[1].value;
+    item.style.display = "none";
+    document.getElementById("favouritesDropdown").style.display = "";
+
+    // setting new favourite dropdown in json
+    favData[i].favourites[j].title = item.childNodes[1].value;
+    fav = JSON.stringify(favData);
+    $.ajax({
+        type: "POST",
+        url: "/headers/write_favourites.php",
+        data: {'fav': fav},
+        dataType: 'text',
+        success: function() {
+            console.log("success?");
+            generateFavorites();
+        }
+     });
+}
+
+function makeVisible(item) {
+    item.childNodes[5].style.visibility = "visible";
+}
+
+function makeInvisible(item) {
+    item.childNodes[5].style.visibility = "hidden";
+}
+
+function dropClick(icon, item, i, j) {
+
+    // console.log(document.getElementById("favouritesDropdown").classList);
+    // document.getElementById("dropdownBtn").classList.add("show");
+    document.getElementById("favouritesDropdown").style.display = "block";
+
+    if (icon == 1) { // edit title
+
+        item.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.style.display = "none";
+        item.parentNode.previousSibling.previousSibling.style.display = "block";
+    }
+
+    if (icon == 2) { // delete favourite
+
+        favData[i].favourites.splice(j, 1);
+        fav = JSON.stringify(favData);
+        $.ajax({
+            type: "POST",
+            url: "/headers/write_favourites.php",
+            data: {'fav': fav},
+            dataType: 'text',
+            success: function() {
+                console.log("success?");
+                generateFavorites();
+            }
+         });
+    }
+}
+
+
+
+{/* '<div class="input-group dropdown-item">
+    <svg xmlns="http://www.w3.org/2000/svg" type="button" id="star" width="1em" height="1em" fill="white" class="bi bi-star mx-2" viewBox="0 0 16 16" onClick="toggleStar();">
+        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+    </svg>
+    <a class="dropdown-item" href="' + favData[i].favourites[j].url + '">' + favData[i].favourites[j].url + '</a>
+</div>' */}
+
+// not used yet
+function loadDate(url, date) {
+    console.log("here");
+
+    const dateurl = function(date) {return {
+        'Today': "&DateStart=" + document.getElementById("DateStart").value + "&DateEnd=" + document.getElementById("DateEnd").value,
+        'Yesterday': "&DateStart=" + document.getElementById("DateStartYes").value + "&DateEnd=" + document.getElementById("DateEndYes").value,
+        'Week to Date': "&DateStart=" + document.getElementById("DateStartWTD").value + "&DateEnd=" + document.getElementById("DateEndWTD").value,
+        'Last Week': "unavailable",
+        'Month to Date': "unavailable",
+        'Last Month': "unavaible",
+        'Period to Date': "unavaiable",
+        'Last Period': "unavailabel",
+        'Quarter to Date': "unavailable",
+        'Last Quarter': "unavailable",
+        'Year to Date': "unavailable",
+        'Last Year': "unavailable",
+        'Year over Year': "&DateStart=" + document.getElementById("DateStartYOY").value + "&DateEnd=" + document.getElementById("DateEndYOY").value,
+        'Year over Year to Last Week End': "&DateStart=" + document.getElementById("DateStartYTLW").value + "&DateEnd=" + document.getElementById("DateEndYTLW").value,
+        'Year to Last Week End': "unavailbel" // put dates in here 
+    }[date];
+    }
+
+    window.location = url + dateurl(date);
+
+}
+
+function changeRange(value) {
+    console.log(value);
+
+    let range = "";
+    if (value == 0) {range = 'Day'}
+    if (value == 1) {range = 'Week'}
+    if (value == 2) {range = 'Period'}
+
+    document.getElementById('rangeLabel').innerHTML = range;
+    
+    appliedFilters(); 
+    applyDefaultFilters(); 
+    resetGraphs(); 
+    refreshGraphs();
+
+    // $.ajax({
+    //     type: "POST",
+    //     url: "/servicelevel/brand.php",
+    //     data: {'graphDate': value},
+    //     dataType: 'text',
+    //     success: function() {
+    //         console.log(value);
+    //         appliedFilters(); 
+    //         applyDefaultFilters(); 
+    //         resetGraphs(); 
+    //         refreshGraphs();
+    //     }
+    //  });
+    
+}
+
+
+
+
+// sample json:
+/*
+[
+    {
+        "user": "julia.anantchenko",
+        "favourites": 
+        [
+            {
+                "title": "Test",
+                "url": "http://10.64.8.2:8080/index.php",
+                "date": null
+            }
+        ]
+    }
+]
+*/

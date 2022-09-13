@@ -1,0 +1,243 @@
+// functions below transferred from the filters.php page
+
+// populating DateStart and DateEnd hidden fields for initial filtering of graphs. also effects what dates show up in the filters pane initially.
+var pageID = document.getElementById('pageID').value;
+var output = window.location.search.substr(1).split('&');
+for (i = 0; i < output.length; i++) {
+    if (output[i].includes('DateStart')) {
+        var DateStartURL = moment(output[i].split('=')[1])
+    }
+    if (output[i].includes('DateEnd')) {
+        var DateEndURL = moment(output[i].split('=')[1])
+    }
+}
+//this logic is for the display in the date range picker
+if (DateStartURL == null && DateEndURL == null) {
+    if ((pageID.split('_')[0] == 'servicelevel' || pageID.split('_')[0] == 'firmflags' || pageID.split('_')[0] == 'staledate') ) {
+        var DateStartURL = moment().subtract(1, 'days');
+        var DateEndURL = moment().subtract(1, 'days');
+    }  else if (pageID.split('_')[0] == 'ipfrusage') {
+        if (moment().startOf('Year').isoWeekday() < 3 || moment().startOf('Year').isoWeekday() == 7) {
+            var DateStartURL = moment().startOf('Year').startOf('Week');
+            var DateEndURL = moment().startOf('Week').subtract(1, 'day');
+        } else {
+            var DateStartURL = moment().subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days');
+            var DateEndURL = moment().startOf('Week').subtract(1, 'day');
+        }
+    } else if (pageID.split('_')[0] == 'ldeforecasterror') {
+        var DateStartURL = moment().isoWeekday(-7);
+        var DateEndURL = moment().isoWeekday(-1);
+    } else if (pageID.split('_')[0] == 'dsdfillrate') {
+        var DateStartURL = moment().isoWeekday(-7);
+        var DateEndURL = moment().isoWeekday(-1);
+    } else {
+        var DateStartURL = moment();
+        var DateEndURL = moment();
+    }
+
+    
+}
+
+if ((pageID.split('_')[0] == 'servicelevel' || pageID.split('_')[0] == 'firmflags' || pageID.split('_')[0] == 'staledate') ) {
+    document.getElementById('DateStart').innerHTML = moment().subtract(1, 'days').format('YYYY-MM-DD');
+    document.getElementById('DateEnd').innerHTML = moment().subtract(1, 'days').format('YYYY-MM-DD');
+    document.getElementById('DateStart').value = moment().subtract(1, 'days').format('YYYY-MM-DD');
+    document.getElementById('DateEnd').value =moment().subtract(1, 'days').format('YYYY-MM-DD');
+} 
+
+else if (pageID.split('_')[0] == 'ipfrusage') {
+    if (moment().startOf('Year').isoWeekday() < 3 || moment().startOf('Year').isoWeekday() == 7) {
+        document.getElementById('DateStart').innerHTML = moment().startOf('Year').startOf('Week').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').innerHTML = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+        document.getElementById('DateStart').value = moment().startOf('Year').startOf('Week').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').value = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+    }    
+    else {
+        document.getElementById('DateStart').innerHTML = moment().subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').innerHTML = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+        document.getElementById('DateStart').value = moment().subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').value = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+    }
+} else if (pageID.split('_')[0] == 'ldeforecasterror') {
+    document.getElementById('DateStart').innerHTML = moment().isoWeekday(-7).format('YYYY-MM-DD');
+    document.getElementById('DateEnd').innerHTML = moment().isoWeekday(-1).format('YYYY-MM-DD');
+    document.getElementById('DateStart').value = moment().isoWeekday(-7).format('YYYY-MM-DD');
+    document.getElementById('DateEnd').value =moment().isoWeekday(-1).format('YYYY-MM-DD');
+} else if (pageID.split('_')[0] == 'dsdfillrate') {
+    document.getElementById('DateStart').innerHTML = moment().isoWeekday(-7).format('YYYY-MM-DD');
+    document.getElementById('DateEnd').innerHTML = moment().isoWeekday(-1).format('YYYY-MM-DD');
+    document.getElementById('DateStart').value = moment().isoWeekday(-7).format('YYYY-MM-DD');
+    document.getElementById('DateEnd').value =moment().isoWeekday(-1).format('YYYY-MM-DD');
+} else if (pageID.split('_')[0] == 'lineexceptions') {
+    if (moment().isoWeek() - 1 % 4 != 0) {
+        document.getElementById('DateStart').innerHTML = moment().subtract((moment().isoWeek() - 1) % 4, 'Week').startOf('Week').subtract(4, 'Week').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').innerHTML = moment().subtract((moment().isoWeek() - 1) % 4, 'Week').startOf('Week').subtract(1, 'days').format('YYYY-MM-DD');
+        document.getElementById('DateStart').value = moment().subtract((moment().isoWeek() - 1) % 4, 'Week').startOf('Week').subtract(4, 'Week').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').value = moment().subtract((moment().isoWeek() - 1) % 4, 'Week').startOf('Week').subtract(1, 'days').format('YYYY-MM-DD');
+    } else {
+        document.getElementById('DateStart').innerHTML = moment().startOf('Week').subtract(4, 'Week').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').innerHTML = moment().startOf('Week').subtract(1, 'days').format('YYYY-MM-DD');
+        document.getElementById('DateStart').value = moment().startOf('Week').subtract(4, 'Week').format('YYYY-MM-DD');
+        document.getElementById('DateEnd').value = moment().startOf('Week').subtract(1, 'days').format('YYYY-MM-DD');  
+    }
+}
+else {
+    document.getElementById('DateStart').innerHTML = moment().format('YYYY-MM-DD');
+    document.getElementById('DateEnd').innerHTML = moment().format('YYYY-MM-DD');
+    document.getElementById('DateStart').value = moment().format('YYYY-MM-DD');
+    document.getElementById('DateEnd').value =moment().format('YYYY-MM-DD');
+}
+// for passing yesterday's dates to the updateLinks function so we can differentiate between setting the default date to yesterday and today
+// !!!! the ID referenced here
+document.getElementById('DateStartYes').innerHTML = moment().subtract(1, 'days').format('YYYY-MM-DD');
+document.getElementById('DateEndYes').innerHTML = moment().subtract(1, 'days').format('YYYY-MM-DD');
+document.getElementById('DateStartYes').value = moment().subtract(1, 'days').format('YYYY-MM-DD');
+document.getElementById('DateEndYes').value =moment().subtract(1, 'days').format('YYYY-MM-DD');
+
+// for passing last sunday's dates to the updateLinks function for the last sun default to be applied
+document.getElementById('DateStartLstSun').innerHTML = moment().isoWeekday(-7).format('YYYY-MM-DD');
+document.getElementById('DateEndLstSun').innerHTML = moment().isoWeekday(-1).format('YYYY-MM-DD');
+document.getElementById('DateStartLstSun').value = moment().isoWeekday(-7).format('YYYY-MM-DD');
+document.getElementById('DateEndLstSun').value =moment().isoWeekday(-1).format('YYYY-MM-DD');
+
+// for passing week start and end dates to the updateLinks function for the WTD default to be applied
+document.getElementById('DateStartWTD').innerHTML = moment().startOf('Week').format('YYYY-MM-DD');
+document.getElementById('DateEndWTD').innerHTML = moment().format('YYYY-MM-DD');
+document.getElementById('DateStartWTD').value = moment().startOf('Week').format('YYYY-MM-DD');
+document.getElementById('DateEndWTD').value =moment().format('YYYY-MM-DD');
+
+// for passing last year's dates to the updateLinks function so we can differentiate between setting the default date to yesterday and today
+if (moment().subtract(1, 'Year').startOf('Year').isoWeekday() < 3 || moment().subtract(1, 'Year').startOf('Year').isoWeekday() == 7) {
+    document.getElementById('DateStartYOY').innerHTML = moment().subtract(1, 'Year').startOf('Year').startOf('Week').format('YYYY-MM-DD');
+    document.getElementById('DateEndYOY').innerHTML = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+    document.getElementById('DateStartYOY').value = moment().subtract(1, 'Year').startOf('Year').startOf('Week').format('YYYY-MM-DD');
+    document.getElementById('DateEndYOY').value = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+} else {
+    document.getElementById('DateStartYOY').innerHTML = moment().subtract(1, 'Year').subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days').format('YYYY-MM-DD');
+    document.getElementById('DateEndYOY').innerHTML = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+    document.getElementById('DateStartYOY').value = moment().subtract(1, 'Year').subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days').format('YYYY-MM-DD');
+    document.getElementById('DateEndYOY').value = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+}
+
+if (moment().startOf('Year').isoWeekday() < 3 || moment().startOf('Year').isoWeekday() == 7) {
+    document.getElementById('DateStartYTLW').innerHTML = moment().startOf('Year').startOf('Week').format('YYYY-MM-DD');
+    document.getElementById('DateStartYTLW').value = moment().startOf('Year').startOf('Week').format('YYYY-MM-DD');
+    document.getElementById('DateEndYTLW').innerHTML = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+    document.getElementById('DateEndYTLW').value = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+} else {
+ document.getElementById('DateStartYTLW').innerHTML = moment().subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days').format('YYYY-MM-DD');
+    document.getElementById('DateStartYTLW').value = moment().subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days').format('YYYY-MM-DD');
+    document.getElementById('DateEndYTLW').innerHTML = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+    document.getElementById('DateEndYTLW').value = moment().startOf('Week').subtract(1, 'day').format('YYYY-MM-DD');
+}
+
+
+$(function() {
+    var pageID = document.getElementById('pageID').value
+ 
+    var start = DateStartURL
+    var end = DateEndURL
+    
+    // logic for Period to Date and Last Period
+    if (moment().isoWeek() - 1 % 4 != 0) {
+        var pdStart = moment().subtract((moment().isoWeek()- 1) % 4, 'Week').startOf('Week')
+        var LastPdStart = moment().subtract((moment().isoWeek() - 1) % 4, 'Week').startOf('Week').subtract(4, 'Week')
+        var LastPdEnd = moment().subtract((moment().isoWeek() - 1) % 4, 'Week').startOf('Week').subtract(1, 'days')
+    }
+    else {
+        var pdStart = moment().startOf('Week')
+        var LastPdStart = moment().startOf('Week').subtract(4, 'Week')
+        var LastPdEnd = moment().startOf('Week').subtract(1, 'days')
+    }
+
+
+    //logic for Year to Date, Last Year End, Quarter to Date and Last Quarter
+    if (moment().startOf('Year').isoWeekday() < 3 || moment().startOf('Year').isoWeekday() == 7) {
+        var YearStart = moment().startOf('Year').startOf('Week')
+        var LastYearEnd = moment().startOf('Year').startOf('Week').subtract(1, 'days')
+        if (moment().isoWeek() <= 12) {
+            var QuarterStart = YearStart
+            var LastQuarterStart = moment().startOf('Year').startOf('Week').subtract(12, 'Week')
+            var LastQuarterEnd = LastYearEnd
+        } else if (moment().isoWeek() > 12 && moment().isoWeek() <= 24) {
+            var QuarterStart = moment().startOf('Year').startOf('Week').add(13, 'Week')
+            var LastQuarterStart = YearStart
+            var LastQuarterEnd = moment().startOf('Year').startOf('Week').add(13, 'Week').subtract(1, ' days')
+        } else if (moment().isoWeek() > 24 && moment().isoWeek() <= 40) {
+            var QuarterStart = moment().startOf('Year').startOf('Week').add(25, 'Week')
+            var LastQuarterStart = moment().startOf('Year').startOf('Week').add(13, 'Week')
+            var LastQuarterEnd = moment().startOf('Year').startOf('Week').add(25, 'Week').subtract(1, 'days')
+        } else {
+            var QuarterStart = moment().startOf('Year').startOf('Week').add(41, 'Week')
+            var LastQuarterStart = moment().startOf('Year').startOf('Week').add(25, 'Week')
+            var LastQuarterEnd = moment().startOf('Year').startOf('Week').add(41, 'Week').subtract(1, 'days')
+        }
+    } else {
+        var YearStart = moment().subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days')
+        var LastYearEnd = moment().subtract(moment().isoWeek(), 'Week').endOf('Week')
+        if (moment().isoWeek() <= 12) {
+            var QuarterStart = YearStart
+            var LastQuarterStart = moment().startOf('Year').startOf('Week').subtract(12, 'Week')
+            var LastQuarterEnd = LastYearEnd
+        } else if (moment().isoWeek() > 12 && moment().isoWeek() <= 24) {
+            var QuarterStart = moment().startOf('Year').startOf('Week').add(13, 'Week')
+            var LastQuarterStart = YearStart
+            var LastQuarterEnd = moment().startOf('Year').startOf('Week').add(13, 'Week').subtract(1, 'days')
+        } else if (moment().isoWeek() > 24 && moment().isoWeek() <= 40) {
+            var QuarterStart = moment().startOf('Year').startOf('Week').add(25, 'Week')
+            var LastQuarterStart = moment().startOf('Year').startOf('Week').add(13, 'Week')
+            var LastQuarterEnd = moment().startOf('Year').startOf('Week').add(25, 'Week').subtract(1, 'days')
+        } else {
+            var QuarterStart = moment().startOf('Year').startOf('Week').add(41, 'Week')
+            var LastQuarterStart = moment().startOf('Year').startOf('Week').add(25, 'Week')
+            var LastQuarterEnd = moment().startOf('Year').startOf('Week').add(41, 'Week').subtract(1, 'days')
+        }
+    }
+    //logic for Last Year Start
+    if (moment().subtract(1, 'Year').startOf('Year').isoWeekday() < 3 || moment().subtract(1, 'Year').startOf('Year').isoWeekday() == 7) {
+        var LastYearStart = moment().subtract(1, 'Year').subtract(moment().isoWeek(), 'Week').endOf('Week').add(1, 'days')
+    } else {
+        var LastYearStart = moment().subtract(1, 'Year').startOf('Year').startOf('Week')
+    }
+
+    function cb(start, end) {
+     //   console.log(start);
+     //   console.log(end);
+        $('#reportrange span').html(moment(start).format('MMMM D, YYYY') + ' - ' + moment(end).format('MMMM D, YYYY'));
+    }
+    //applying the js plugin to the reportrange object and defining date ranges
+    $('#reportrange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(),moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Week to Date': [moment().startOf('Week'), moment()],
+            'Last Week': [moment().subtract(1, 'Week').startOf('Week'), moment().subtract(1, 'Week').endOf('Week')],
+            'Month to Date': [moment().startOf('month'), moment()],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'Period to Date': [pdStart, moment()],
+            'Last Period': [LastPdStart, LastPdEnd],
+            'Quarter to Date': [QuarterStart, moment()],
+            'Last Quarter': [LastQuarterStart, LastQuarterEnd],
+            'Year to Date': [YearStart, moment()],
+            'Last Year': [LastYearStart, LastYearEnd],
+            'Year over Year': [LastYearStart, moment()],
+            'Year over Year to Last Week End': [LastYearStart, moment().startOf('Week').subtract(1, 'day')],
+            'Year to Last Week End': [YearStart, moment().startOf('Week').subtract(1, 'day')]
+
+        }
+    }, cb);
+
+
+    cb(start, end);
+    //updating the date values
+    $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+        document.getElementById('DateStart').innerHTML = picker.startDate.format('YYYY-MM-DD');
+        document.getElementById('DateEnd').innerHTML = picker.endDate.format('YYYY-MM-DD');
+        document.getElementById('DateStart').value = picker.startDate.format('YYYY-MM-DD');
+        document.getElementById('DateEnd').value = picker.endDate.format('YYYY-MM-DD');
+
+        setDateLabel(picker.chosenLabel);
+    })
+});
